@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import type { User, Module, Problem } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -21,13 +21,18 @@ import {
   PieChart,
   Building,
   FileText,
-  PlayCircle
+  PlayCircle,
+  Bot,
+  Sparkles
 } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { AITutor } from "@/components/ai-tutor";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
+  const [showAITutor, setShowAITutor] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState("");
 
   // Type guard for user data
   const typedUser = user as User | undefined;
@@ -43,12 +48,12 @@ export default function Home() {
     enabled: !!user,
   });
 
-  const { data: userProgress = [] } = useQuery({
+  const { data: userProgress = [] } = useQuery<any[]>({
     queryKey: ["/api/progress", typedUser?.id],
     enabled: !!typedUser?.id,
   });
 
-  const { data: dashboardData } = useQuery({
+  const { data: dashboardData } = useQuery<{dashboard: any}>({
     queryKey: ["/api/analytics/dashboard"],
     enabled: !!typedUser?.id,
   });
@@ -63,10 +68,10 @@ export default function Home() {
     averageScore: dashboardStats.overallAccuracy
   } : {
     totalProblems: problems.length,
-    completedProblems: userProgress.reduce((sum: number, progress: any) => sum + (progress.score || 0), 0),
+    completedProblems: Array.isArray(userProgress) ? userProgress.reduce((sum: number, progress: any) => sum + (progress.score || 0), 0) : 0,
     totalModules: modules.length,
-    completedModules: userProgress.filter((p: any) => p.completed).length,
-    averageScore: userProgress.length > 0 ? 
+    completedModules: Array.isArray(userProgress) ? userProgress.filter((p: any) => p.completed).length : 0,
+    averageScore: Array.isArray(userProgress) && userProgress.length > 0 ? 
       userProgress.reduce((sum: any, progress: any) => sum + (progress.score || 0), 0) / userProgress.length : 0
   };
 
@@ -408,6 +413,32 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </main>
+      {/* AI Tutor Modal */}
+      {showAITutor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <Sparkles className="h-6 w-6 text-blue-600" />
+                  AI-Enhanced Learning
+                </h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowAITutor(false)}
+                  data-testid="button-close-ai-modal"
+                >
+                  ×
+                </Button>
+              </div>
+              <AITutor 
+                topic={selectedTopic} 
+                onClose={() => setShowAITutor(false)} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

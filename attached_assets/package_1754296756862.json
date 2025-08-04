@@ -1,0 +1,40 @@
+{
+  "name": "acf-mastery-platform-enhanced",
+  "version": "2.0.0",
+  "description": "Advanced Corporate Finance Learning Platform - Production Ready for Replit",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "health": "curl -f http://localhost:3000/api/health || exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "@replit/database": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "finance",
+    "education",
+    "learning-platform",
+    "acf",
+    "kellogg",
+    "replit"
+  ],
+  "author": "ACF Mastery Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nikhillinit/ACF-Interactive-Learning.git"
+  }
+}

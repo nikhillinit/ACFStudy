@@ -13,6 +13,7 @@ import {
   enhancedAuth
 } from "./enhanced-auth";
 import { insertProgressSchema } from "@shared/schema";
+import { aiServices } from "./ai-services";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced security middleware
@@ -159,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const topicStats: Record<string, any> = {};
       
-      Object.entries(problemCounts).forEach(([topic, count]) => {
+      Object.entries(problemCounts).forEach(([topic, count]: [string, number]) => {
         const topicProgress = progress[topic] || { completed: [], accuracy: 0 };
         const completed = Array.isArray(topicProgress.completed) ? topicProgress.completed.length : 0;
         
@@ -200,16 +201,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI-Powered Routes
+  app.post('/api/ai/explanation', isAuthenticated, async (req: any, res) => {
+    try {
+      const { problem, topic, userAnswer, correctAnswer, difficulty } = req.body;
+      
+      if (!problem || !topic || !correctAnswer) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: problem, topic, correctAnswer'
+        });
+      }
+
+      const explanation = await aiServices.getPersonalizedExplanation({
+        problem,
+        topic,
+        userAnswer,
+        correctAnswer,
+        difficulty: difficulty || 1
+      });
+
+      res.json({
+        success: true,
+        explanation
+      });
+    } catch (error) {
+      console.error('AI explanation error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get AI explanation'
+      });
+    }
+  });
+
+  app.post('/api/ai/tutor', isAuthenticated, async (req: any, res) => {
+    try {
+      const { topic, userLevel, specificQuestion } = req.body;
+      
+      if (!topic || !userLevel) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: topic, userLevel'
+        });
+      }
+
+      const guidance = await aiServices.getPersonalizedTutoring({
+        topic,
+        userLevel,
+        specificQuestion
+      });
+
+      res.json({
+        success: true,
+        guidance
+      });
+    } catch (error) {
+      console.error('AI tutor error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get AI tutoring'
+      });
+    }
+  });
+
+  app.post('/api/ai/generate-problems', isAuthenticated, async (req: any, res) => {
+    try {
+      const { topic, difficulty, count } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required field: topic'
+        });
+      }
+
+      const problems = await aiServices.generatePracticeProblems(
+        topic,
+        difficulty || 1,
+        count || 3
+      );
+
+      res.json({
+        success: true,
+        problems
+      });
+    } catch (error) {
+      console.error('AI problem generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate problems'
+      });
+    }
+  });
+
+  app.get('/api/ai/market-context/:topic', isAuthenticated, async (req: any, res) => {
+    try {
+      const { topic } = req.params;
+      
+      const context = await aiServices.getMarketContext(topic);
+
+      res.json({
+        success: true,
+        context
+      });
+    } catch (error) {
+      console.error('AI market context error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get market context'
+      });
+    }
+  });
+
   // Health Check Route
   app.get('/api/health', async (req, res) => {
     try {
+      const aiServicesStatus = {
+        claude: !!process.env.CLAUDE_API_KEY,
+        openai: !!process.env.OPENAI_API_KEY,
+        perplexity: !!process.env.PERPLEXITY_API_KEY
+      };
+
       res.json({
         success: true,
         status: 'healthy',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        version: '2.0.0'
+        version: '2.0.0',
+        aiServices: aiServicesStatus
       });
     } catch (error) {
       res.status(503).json({
