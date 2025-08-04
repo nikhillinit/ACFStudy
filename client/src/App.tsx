@@ -19,9 +19,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
-          <Route path="/practice/:topic">
-            {(params) => <Practice topic={params.topic} />}
-          </Route>
+          <Route path="/practice" component={Practice} />
           {/* Add more authenticated routes here as needed */}
         </>
       )}

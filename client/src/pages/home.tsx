@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 import type { User, Module, Problem } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -23,7 +24,8 @@ import {
   FileText,
   PlayCircle,
   Bot,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { AITutor } from "@/components/ai-tutor";
@@ -215,16 +217,39 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Quick Actions Bar */}
+        <div className="mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+            <Link href="/practice">
+              <Button className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-practice-center">
+                <Target className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm">Practice Center</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            </Link>
+            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-ai-tutor" onClick={() => setShowAITutor(true)}>
+              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm">AI Tutor</span>
+            </Button>
+            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-quick-diagnostic">
+              <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm">Diagnostic</span>
+            </Button>
+            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-formulas">
+              <Calculator className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm">Formulas</span>
+            </Button>
+          </div>
+        </div>
+
         {/* Learning Platform Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-1">
             <TabsTrigger value="dashboard" className="text-xs sm:text-sm">Dashboard</TabsTrigger>
             <TabsTrigger value="modules" className="text-xs sm:text-sm">Modules</TabsTrigger>
-            <TabsTrigger value="learning-path" className="text-xs sm:text-sm">Path</TabsTrigger>
-            <TabsTrigger value="practice" className="text-xs sm:text-sm">Practice</TabsTrigger>
-            <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">Test</TabsTrigger>
-            <TabsTrigger value="drills" className="text-xs sm:text-sm">Drills</TabsTrigger>
-            <TabsTrigger value="formulas" className="text-xs sm:text-sm">Formulas</TabsTrigger>
+            <TabsTrigger value="learning-path" className="text-xs sm:text-sm">Learning Path</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
+            <TabsTrigger value="achievements" className="text-xs sm:text-sm">Achievements</TabsTrigger>
           </TabsList>
 
           {/* Dashboard Tab */}

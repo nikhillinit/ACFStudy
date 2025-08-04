@@ -448,6 +448,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Enhanced Practice Session Routes
+  app.get("/api/practice/problems/:topic", isAuthenticated, async (req: any, res) => {
+    try {
+      const { topic } = req.params;
+      const count = parseInt(req.query.count as string) || 10;
+      
+      // Import the enhanced problems
+      const { AdaptiveLearningEngine } = await import('./enhanced-problems');
+      
+      // Get user progress for adaptive selection
+      const userId = req.user.claims.sub;
+      const userProgress = {}; // Would get from database in real implementation
+      
+      const selectedProblems = AdaptiveLearningEngine.selectProblems(topic, userProgress, count);
+      
+      res.json({
+        success: true,
+        problems: selectedProblems,
+        topic,
+        count: selectedProblems.length
+      });
+    } catch (error) {
+      console.error("Error getting practice problems:", error);
+      res.status(500).json({ message: "Failed to get practice problems" });
+    }
+  });
+
+  app.post("/api/practice/session/complete", isAuthenticated, async (req: any, res) => {
+    try {
+      const { sessionResults } = req.body;
+      const userId = req.user.claims.sub;
+      
+      // Calculate performance metrics
+      const performance = {
+        accuracy: (sessionResults.correctAnswers / sessionResults.totalProblems) * 100,
+        averageTime: sessionResults.averageTime,
+        topicMastery: sessionResults.correctAnswers >= sessionResults.totalProblems * 0.8,
+        improvementAreas: sessionResults.results
+          .filter((r: any) => !r.correct)
+          .map((r: any) => r.topic)
+      };
+      
+      res.json({
+        success: true,
+        performance,
+        message: "Session completed successfully"
+      });
+    } catch (error) {
+      console.error("Error completing practice session:", error);
+      res.status(500).json({ message: "Failed to complete session" });
+    }
+  });
+
+  app.get("/api/diagnostic/test", isAuthenticated, async (req: any, res) => {
+    try {
+      const { AdaptiveLearningEngine } = await import('./enhanced-problems');
+      const diagnosticProblems = AdaptiveLearningEngine.createDiagnosticTest();
+      
+      res.json({
+        success: true,
+        problems: diagnosticProblems,
+        totalQuestions: diagnosticProblems.length,
+        estimatedTime: 30 // minutes
+      });
+    } catch (error) {
+      console.error("Error creating diagnostic test:", error);
+      res.status(500).json({ message: "Failed to create diagnostic test" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

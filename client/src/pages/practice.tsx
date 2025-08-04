@@ -1,299 +1,400 @@
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PracticeSession } from '@/components/practice-session';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import { 
-  ArrowLeft, 
-  ArrowRight, 
+  Target, 
   Clock, 
-  CheckCircle, 
-  XCircle, 
-  Target,
-  HelpCircle,
-  RotateCcw
-} from "lucide-react";
-import type { Problem } from "@shared/schema";
+  TrendingUp, 
+  BookOpen, 
+  PlayCircle,
+  Award,
+  CheckCircle2,
+  BarChart3
+} from 'lucide-react';
 
-interface PracticePageProps {
-  moduleId?: string;
-  topic?: string;
+interface ACFProblem {
+  id: string;
+  topic: string;
+  difficulty: number;
+  question: string;
+  answer: string | number;
+  solution: string;
+  concepts: string[];
+  hints?: string[];
+  timeEstimate?: number;
+  realWorldContext?: string;
 }
 
-export default function Practice({ moduleId, topic }: PracticePageProps) {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+const topicIcons: Record<string, any> = {
+  'Time Value of Money': TrendingUp,
+  'Portfolio Theory': BarChart3,
+  'Bond Valuation': Award,
+  'Financial Statements': BookOpen,
+  'Derivatives': Target
+};
+
+const topics = [
+  { 
+    id: 'Time Value of Money', 
+    name: 'Time Value of Money', 
+    description: 'Master present value, future value, and annuity calculations',
+    problemCount: 25,
+    difficulty: 1,
+    estimatedTime: 120
+  },
+  { 
+    id: 'Portfolio Theory', 
+    name: 'Portfolio Theory', 
+    description: 'Learn CAPM, risk-return relationships, and modern portfolio optimization',
+    problemCount: 25,
+    difficulty: 2,
+    estimatedTime: 150
+  },
+  { 
+    id: 'Bond Valuation', 
+    name: 'Bond Valuation', 
+    description: 'Understand bond pricing, yield calculations, and duration concepts',
+    problemCount: 25,
+    difficulty: 2,
+    estimatedTime: 135
+  },
+  { 
+    id: 'Financial Statements', 
+    name: 'Financial Statements', 
+    description: 'Analyze financial statements and understand accounting principles',
+    problemCount: 15,
+    difficulty: 1,
+    estimatedTime: 90
+  },
+  { 
+    id: 'Derivatives', 
+    name: 'Derivatives', 
+    description: 'Options, futures, and forward contracts fundamentals',
+    problemCount: 25,
+    difficulty: 3,
+    estimatedTime: 180
+  }
+];
+
+export default function PracticePage() {
+  const [activeSession, setActiveSession] = useState<{
+    topic: string;
+    problems: ACFProblem[];
+  } | null>(null);
+  const [selectedTab, setSelectedTab] = useState('topics');
   
-  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [sessionStartTime] = useState(Date.now());
-  const [userAnswers, setUserAnswers] = useState<Record<number, { answer: string; isCorrect: boolean }>>({});
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Fetch problems for practice
-  const { data: problems = [] } = useQuery<Problem[]>({
-    queryKey: ["/api/problems", { topic }],
-    enabled: !!user,
+  // Fetch diagnostic test
+  const { data: diagnosticData, isLoading: diagnosticLoading } = useQuery({
+    queryKey: ['/api/diagnostic/test'],
+    enabled: selectedTab === 'diagnostic'
   });
 
-  const currentProblem = problems[currentProblemIndex];
-  const isLastProblem = currentProblemIndex === problems.length - 1;
-  const isFirstProblem = currentProblemIndex === 0;
-
-  // Submit answer mutation
-  const submitAnswerMutation = useMutation({
-    mutationFn: async (data: { problemId: string; answer: string; timeSpent: number }) => {
-      return apiRequest(`/api/attempts`, "POST", data);
+  // Start practice session mutation
+  const startPracticeMutation = useMutation({
+    mutationFn: async ({ topic, count }: { topic: string; count: number }) => {
+      return await apiRequest(`/api/practice/problems/${topic}?count=${count}`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+    onSuccess: (data, variables) => {
+      setActiveSession({
+        topic: variables.topic,
+        problems: data.problems
+      });
     },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to start practice session. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
-  const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer);
+  // Complete session mutation
+  const completeSessionMutation = useMutation({
+    mutationFn: async (sessionResults: any) => {
+      return await apiRequest('/api/practice/session/complete', {
+        method: 'POST',
+        body: { sessionResults }
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Session Complete!",
+        description: `Accuracy: ${Math.round(data.performance.accuracy)}% | ${data.performance.topicMastery ? 'Topic Mastered!' : 'Keep practicing!'}`,
+        variant: data.performance.topicMastery ? "default" : "destructive"
+      });
+      setActiveSession(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to complete session. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleStartPractice = (topicName: string, count: number = 10) => {
+    startPracticeMutation.mutate({ topic: topicName, count });
   };
 
-  const handleSubmitAnswer = () => {
-    if (!selectedAnswer || !currentProblem) return;
+  const handleStartDiagnostic = () => {
+    if (diagnosticData?.problems) {
+      setActiveSession({
+        topic: 'Diagnostic Test',
+        problems: diagnosticData.problems
+      });
+    }
+  };
 
-    const isCorrect = selectedAnswer === currentProblem.answer;
-    const timeSpent = Date.now() - sessionStartTime;
+  const handleSessionComplete = (results: any) => {
+    completeSessionMutation.mutate(results);
+  };
 
-    // Store user's answer
-    setUserAnswers(prev => ({
-      ...prev,
-      [currentProblemIndex]: { answer: selectedAnswer, isCorrect }
-    }));
-
-    // Submit to backend
-    submitAnswerMutation.mutate({
-      problemId: currentProblem.id,
-      answer: selectedAnswer,
-      timeSpent,
+  const handleExitSession = () => {
+    setActiveSession(null);
+    toast({
+      title: "Session Ended",
+      description: "Your progress has been saved.",
+      variant: "default"
     });
-
-    setShowExplanation(true);
   };
 
-  const handleNextProblem = () => {
-    if (isLastProblem) {
-      // Show results summary
-      showSessionResults();
-    } else {
-      setCurrentProblemIndex(prev => prev + 1);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
+  const getDifficultyColor = (difficulty: number) => {
+    switch (difficulty) {
+      case 1: return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 2: return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 3: return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
   };
 
-  const handlePreviousProblem = () => {
-    if (!isFirstProblem) {
-      setCurrentProblemIndex(prev => prev - 1);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
+  const getDifficultyLabel = (difficulty: number) => {
+    switch (difficulty) {
+      case 1: return 'Beginner';
+      case 2: return 'Intermediate';
+      case 3: return 'Advanced';
+      default: return 'Unknown';
     }
   };
 
-  const showSessionResults = () => {
-    // Calculate session statistics
-    const totalAnswered = Object.keys(userAnswers).length;
-    const correctAnswers = Object.values(userAnswers).filter(a => a.isCorrect).length;
-    const accuracy = totalAnswered > 0 ? (correctAnswers / totalAnswered) * 100 : 0;
-
-    console.log(`Session Complete: ${correctAnswers}/${totalAnswered} (${accuracy.toFixed(1)}%)`);
-    // This would typically navigate to a results page or show a modal
-  };
-
-  if (!currentProblem) {
+  // Show practice session if active
+  if (activeSession) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No Problems Available</h3>
-            <p className="text-gray-600 mb-4">
-              No practice problems found for this topic.
-            </p>
-            <Button onClick={() => window.history.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Go Back
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <PracticeSession
+            topic={activeSession.topic}
+            problems={activeSession.problems}
+            onComplete={handleSessionComplete}
+            onExit={handleExitSession}
+          />
+        </div>
       </div>
     );
   }
 
-  const progress = ((currentProblemIndex + 1) / problems.length) * 100;
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => window.history.back()}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-lg font-semibold">{topic} Practice</h1>
-              <p className="text-sm text-gray-600">
-                Question {currentProblemIndex + 1} of {problems.length}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="w-32">
-              <Progress value={progress} className="h-2" />
-            </div>
-            <Badge variant="outline">
-              {Math.round(progress)}% Complete
-            </Badge>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Practice Center
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Master Advanced Corporate Finance through targeted practice sessions and comprehensive diagnostics.
+          </p>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary">{currentProblem.difficulty}</Badge>
-                <Badge variant="outline">{currentProblem.topic}</Badge>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Clock className="h-4 w-4" />
-                <span>~2 min</span>
-              </div>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            {/* Problem Statement */}
-            <div>
-              <h3 className="text-lg font-medium mb-3">Problem</h3>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="whitespace-pre-wrap">{currentProblem.question}</p>
-              </div>
-            </div>
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8">
+            <TabsTrigger value="topics" className="text-xs sm:text-sm">Practice Topics</TabsTrigger>
+            <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">Diagnostic Test</TabsTrigger>
+            <TabsTrigger value="adaptive" className="text-xs sm:text-sm">Adaptive Mode</TabsTrigger>
+          </TabsList>
 
-            {/* Answer Options */}
-            {!showExplanation ? (
-              <div>
-                <h4 className="font-medium mb-3">Choose your answer:</h4>
-                <div className="space-y-3">
-                  {/* Since our schema has a simple answer field, we'll create mock options */}
-                  {["A", "B", "C", "D"].map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswerSelect(option)}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
-                        selectedAnswer === option
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                      data-testid={`option-${index}`}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          selectedAnswer === option
-                            ? "border-blue-500 bg-blue-500"
-                            : "border-gray-300"
-                        }`}>
-                          {selectedAnswer === option && (
-                            <div className="w-2 h-2 bg-white rounded-full" />
-                          )}
-                        </div>
-                        <span className="flex-1">Option {option}</span>
-                      </div>
-                    </button>
-                  ))}
+          {/* Practice Topics Tab */}
+          <TabsContent value="topics" className="space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                  <Target className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                  <span>Choose Your Practice Topic</span>
+                </CardTitle>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Select a topic to practice. Problems are intelligently selected based on your performance and learning progress.
+                </p>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+                  {topics.map((topic) => {
+                    const IconComponent = topicIcons[topic.name] || BookOpen;
+                    return (
+                      <Card key={topic.id} className="hover:shadow-lg transition-all duration-200 hover:scale-105">
+                        <CardHeader className="p-3 sm:p-4">
+                          <div className="flex items-start space-x-2 sm:space-x-3">
+                            <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900 rounded-lg shrink-0">
+                              <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm sm:text-base font-semibold leading-tight">{topic.name}</h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1">
+                                {topic.description}
+                              </p>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-3 sm:p-4 pt-0">
+                          <div className="space-y-2 sm:space-y-3">
+                            <div className="flex flex-wrap gap-1 sm:gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                {topic.problemCount} Problems
+                              </Badge>
+                              <Badge variant="outline" className={`text-xs ${getDifficultyColor(topic.difficulty)}`}>
+                                {getDifficultyLabel(topic.difficulty)}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {topic.estimatedTime}min
+                              </Badge>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStartPractice(topic.name, 5)}
+                                disabled={startPracticeMutation.isPending}
+                                className="text-xs sm:text-sm"
+                                data-testid={`button-quick-practice-${topic.id}`}
+                              >
+                                Quick (5)
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleStartPractice(topic.name, 10)}
+                                disabled={startPracticeMutation.isPending}
+                                className="text-xs sm:text-sm"
+                                data-testid={`button-full-practice-${topic.id}`}
+                              >
+                                <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                Full (10)
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
-                
-                <div className="flex justify-center mt-6">
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Diagnostic Test Tab */}
+          <TabsContent value="diagnostic" className="space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                  <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                  <span>Comprehensive Diagnostic Assessment</span>
+                </CardTitle>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Take this comprehensive assessment to identify your strengths and areas for improvement across all ACF topics.
+                </p>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-4 sm:p-6 rounded-lg border border-purple-200 dark:border-purple-800 mb-6">
+                  <h3 className="text-lg font-semibold mb-3 text-purple-900 dark:text-purple-100">
+                    Assessment Format
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">25</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">Questions</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">30</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">Minutes</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">5</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">Topics</div>
+                    </div>
+                    <div className="text-center">
+                      <CheckCircle2 className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mx-auto" />
+                      <div className="text-xs sm:text-sm text-muted-foreground">Instant Results</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg mb-6">
+                  <h4 className="font-medium mb-2 text-blue-900 dark:text-blue-100">What you'll get:</h4>
+                  <ul className="text-sm space-y-1 text-blue-800 dark:text-blue-200">
+                    <li>• Personalized strength and weakness analysis</li>
+                    <li>• Topic-specific performance breakdown</li>
+                    <li>• Customized study recommendations</li>
+                    <li>• Progress tracking baseline</li>
+                  </ul>
+                </div>
+
+                <div className="text-center">
                   <Button
-                    onClick={handleSubmitAnswer}
-                    disabled={!selectedAnswer || submitAnswerMutation.isPending}
-                    data-testid="button-submit-answer"
+                    size="lg"
+                    onClick={handleStartDiagnostic}
+                    disabled={diagnosticLoading || !diagnosticData?.problems}
+                    className="text-sm sm:text-base px-6 sm:px-8 py-3"
+                    data-testid="button-start-diagnostic"
                   >
-                    {submitAnswerMutation.isPending ? "Submitting..." : "Submit Answer"}
+                    {diagnosticLoading ? 'Loading Assessment...' : 'Start Diagnostic Test'}
                   </Button>
                 </div>
-              </div>
-            ) : (
-              /* Explanation & Results */
-              <div className="space-y-4">
-                {/* Answer Result */}
-                <div className={`p-4 rounded-lg ${
-                  userAnswers[currentProblemIndex]?.isCorrect 
-                    ? "bg-green-50 border border-green-200" 
-                    : "bg-red-50 border border-red-200"
-                }`}>
-                  <div className="flex items-center space-x-2">
-                    {userAnswers[currentProblemIndex]?.isCorrect ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-600" />
-                    )}
-                    <span className="font-medium">
-                      {userAnswers[currentProblemIndex]?.isCorrect ? "Correct!" : "Incorrect"}
-                    </span>
-                  </div>
-                  {!userAnswers[currentProblemIndex]?.isCorrect && (
-                    <p className="mt-2 text-sm">
-                      The correct answer is: <strong>{currentProblem.answer}</strong>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Adaptive Mode Tab */}
+          <TabsContent value="adaptive" className="space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                  <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                  <span>AI-Powered Adaptive Learning</span>
+                </CardTitle>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Let our AI create personalized practice sessions based on your performance and learning patterns.
+                </p>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-center py-8 sm:py-12">
+                  <div className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-950/20 dark:to-blue-950/20 p-6 sm:p-8 rounded-lg border border-green-200 dark:border-green-800">
+                    <TrendingUp className="h-12 w-12 sm:h-16 sm:w-16 text-green-600 mx-auto mb-4" />
+                    <h3 className="text-lg sm:text-xl font-semibold mb-3 text-green-900 dark:text-green-100">
+                      Adaptive Mode Coming Soon
+                    </h3>
+                    <p className="text-sm sm:text-base text-muted-foreground mb-6">
+                      Complete a few practice sessions to unlock AI-powered adaptive learning that personalizes your study experience.
                     </p>
-                  )}
-                </div>
-
-                {/* Explanation */}
-                <div>
-                  <h4 className="font-medium mb-2 flex items-center">
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    Explanation
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="whitespace-pre-wrap">{currentProblem.solution}</p>
+                    <Button variant="outline" disabled className="text-sm sm:text-base">
+                      Complete 3 Practice Sessions to Unlock
+                    </Button>
                   </div>
                 </div>
-
-                {/* Navigation */}
-                <div className="flex justify-between items-center pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={handlePreviousProblem}
-                    disabled={isFirstProblem}
-                    data-testid="button-previous"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Previous
-                  </Button>
-                  
-                  <Button
-                    onClick={handleNextProblem}
-                    data-testid="button-next"
-                  >
-                    {isLastProblem ? "Finish Session" : "Next Problem"}
-                    {!isLastProblem && <ArrowRight className="h-4 w-4 ml-2" />}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
