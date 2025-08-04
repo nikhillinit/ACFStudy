@@ -1,0 +1,617 @@
+# 🎯 ACF Mastery Platform - Detailed Implementation Plan & Workflow
+
+## 📋 Table of Contents
+1. [User Journey & Workflows](#user-journey)
+2. [Technical Architecture](#technical-architecture)
+3. [Module Content Structure](#module-content)
+4. [Data Models & State Management](#data-models)
+5. [AI Integration Points](#ai-integration)
+6. [Development Timeline](#timeline)
+7. [Deployment Strategy](#deployment)
+
+---
+
+## 1. User Journey & Workflows {#user-journey}
+
+### 🚀 Initial Onboarding Flow
+
+```mermaid
+Start → Welcome Screen → Name/Email Input → Honor Code Agreement → 
+→ Tutorial (2 min) → Diagnostic Test → Personalized Dashboard
+```
+
+#### Welcome Screen Components:
+- **Hero Message**: "Master Advanced Corporate Finance in 7 Days"
+- **Value Props**: 
+  - ✅ Mirrors actual Kellogg ACF exam
+  - ✅ AI-powered personalized learning
+  - ✅ Track progress across devices
+- **CTA**: "Start Your Journey" button
+
+#### Diagnostic Test Workflow:
+```
+1. Pre-test briefing (exam format, timing, calculator tips)
+2. 25 questions across 5 topics (30 minutes total)
+3. Auto-save every answer (in case of connection loss)
+4. Immediate scoring with topic breakdown
+5. Generate personalized study plan
+```
+
+### 📚 Daily Learning Workflow
+
+```
+Morning (5 min)          Main Study (90-120 min)         Evening (10 min)
+├── Drill unlocked?  →   ├── Dashboard check        →    ├── Review progress
+├── 5 quick problems     ├── Select weak topic           ├── Set tomorrow goal
+└── Performance recap    ├── Complete module             └── Optional practice
+                        └── Take competency exam
+```
+
+### 🎓 Individual Module Flow
+
+```
+MODULE START
+    ↓
+1. OVERVIEW (5 min)
+   ├── Learning objectives
+   ├── Real-world relevance
+   └── Prerequisites check
+    ↓
+2. CONCEPT TEACHING (15 min)
+   ├── Video OR interactive text
+   ├── Key formulas highlighted
+   └── Pause points for reflection
+    ↓
+3. CASE STUDY (10 min)
+   ├── Real company example
+   ├── Walk through analysis
+   └── Key takeaways
+    ↓
+4. WORKED EXAMPLES (15 min)
+   ├── 3-5 problems solved step-by-step
+   ├── Multiple solution methods shown
+   └── Common mistakes highlighted
+    ↓
+5. GUIDED PRACTICE (20 min)
+   ├── 10 problems with hints available
+   ├── Immediate feedback
+   └── Solution explanations
+    ↓
+6. INDEPENDENT PRACTICE (20 min)
+   ├── 10 exam-style problems
+   ├── Timed environment
+   └── Score tracking
+    ↓
+7. COMPETENCY EXAM (15 min)
+   ├── 10 questions, 80% to pass
+   ├── No hints, exam conditions
+   └── Detailed results analysis
+    ↓
+MODULE COMPLETE → Update progress → Unlock morning drills
+```
+
+---
+
+## 2. Technical Architecture {#technical-architecture}
+
+### 🏗️ File Structure
+
+```
+acf-mastery-platform/
+├── index.html                 # Main application file
+├── assets/
+│   ├── problems.json         # 500+ exam-style problems
+│   ├── formulas.json         # Formula reference data
+│   └── content.json          # Module content & videos
+├── js/
+│   ├── app.js               # Main application logic
+│   ├── modules/
+│   │   ├── diagnostic.js    # Diagnostic test engine
+│   │   ├── learning.js      # Module delivery system
+│   │   ├── practice.js      # Practice problem engine
+│   │   ├── drills.js        # Morning drill system
+│   │   └── progress.js      # Progress tracking
+│   ├── utils/
+│   │   ├── calculator.js    # Financial calculator
+│   │   ├── storage.js       # Data persistence
+│   │   └── ai-client.js     # AI API integration
+│   └── config.js            # Configuration & API keys
+├── css/
+│   ├── main.css            # Core styles
+│   └── themes/             # Light/dark themes
+└── replit/
+    ├── .replit             # Replit configuration
+    └── replit.nix          # Environment setup
+```
+
+### 🔧 Core Components
+
+```javascript
+// Main Application State
+const AppState = {
+  user: {
+    id: 'uuid',
+    name: 'string',
+    email: 'string',
+    startDate: Date,
+    lastActive: Date
+  },
+  
+  diagnostic: {
+    completed: boolean,
+    results: {
+      pv_amortization: { score: 0.0, questions: [...] },
+      portfolio_risk: { score: 0.0, questions: [...] },
+      bond_valuation: { score: 0.0, questions: [...] },
+      financial_statements: { score: 0.0, questions: [...] },
+      statement_interactions: { score: 0.0, questions: [...] }
+    },
+    recommendations: [...]
+  },
+  
+  modules: {
+    pv_amortization: {
+      status: 'locked|available|in_progress|completed',
+      contentViewed: boolean,
+      practiceScore: 0.0,
+      competencyPassed: boolean,
+      attempts: [...],
+      lastAccessed: Date
+    },
+    // ... other modules
+  },
+  
+  drills: {
+    available: boolean,
+    todayCompleted: boolean,
+    streak: number,
+    history: [...]
+  }
+};
+```
+
+### 🎨 UI Components
+
+```javascript
+// Component Architecture
+const UIComponents = {
+  // Navigation
+  TopNav: { logo, progress bar, user menu },
+  SideNav: { module list, progress indicators, quick actions },
+  
+  // Learning
+  VideoPlayer: { playback controls, transcript, notes },
+  ProblemDisplay: { question, input, calculator, timer },
+  SolutionReview: { step-by-step, formula highlight, tips },
+  
+  // Progress
+  Dashboard: { mastery wheel, weak areas, study streak },
+  Analytics: { performance graphs, time tracking, predictions },
+  
+  // Interactions
+  HintSystem: { progressive hints, AI explanations },
+  Calculator: { BA II Plus emulation, history },
+  FormulaSheet: { searchable, favorites, examples }
+};
+```
+
+---
+
+## 3. Module Content Structure {#module-content}
+
+### 📖 Module 1: Present Value & Amortization
+
+```yaml
+Overview:
+  Duration: 5 minutes
+  Content:
+    - Why PV matters in finance
+    - Real-world applications
+    - Module objectives
+
+Video Lesson: (15 minutes)
+  Segments:
+    1. Time Value of Money Concept (3 min)
+    2. Present Value Formula Deep Dive (4 min)
+    3. Annuities and Perpetuities (4 min)
+    4. Loan Amortization Mechanics (4 min)
+
+Case Study: "Tesla's Gigafactory Investment"
+  - Initial investment analysis
+  - Cash flow projections
+  - NPV calculation walkthrough
+
+Worked Examples:
+  1. Single Cash Flow PV
+     - $10,000 in 5 years at 6%
+     - Show formula substitution
+     - Calculator steps
+  
+  2. Annuity PV
+     - $1,000/year for 10 years at 8%
+     - Formula vs. calculator method
+     - Excel demonstration
+  
+  3. Loan Payment Calculation
+     - $200,000 mortgage, 30 years, 4.5%
+     - Monthly payment derivation
+     - Amortization schedule
+
+Practice Problems:
+  Guided (10):
+    - Progressive difficulty
+    - Hints: formula → values → first step
+    - Common errors flagged
+  
+  Independent (10):
+    - Exam-style format
+    - 2-minute time suggestions
+    - No hints available
+
+Competency Exam:
+  - 10 questions, 15 minutes
+  - Topics weighted by exam frequency
+  - Pass: 8/10 correct
+```
+
+### 📊 Module 2: Portfolio Theory & Risk
+
+```yaml
+Overview:
+  Focus: Expected returns, variance, correlation effects
+
+Content Delivery:
+  Written Guide + Interactive Visualizations:
+    - Portfolio return calculation
+    - Risk (standard deviation) computation
+    - Correlation impact demonstrations
+    - Efficient frontier concept
+
+Case Study: "Building a Tech-Heavy Portfolio"
+  - FAANG stocks analysis
+  - Risk-return tradeoffs
+  - Diversification benefits
+
+[Similar structure for remaining modules...]
+```
+
+---
+
+## 4. Data Models & State Management {#data-models}
+
+### 💾 Problem Database Schema
+
+```javascript
+const ProblemSchema = {
+  id: 'uuid',
+  topic: 'pv_amortization|portfolio_risk|bond_valuation|fin_statements|interactions',
+  subtopic: 'string', // e.g., "single_cash_flow", "loan_payments"
+  difficulty: 1-3,
+  
+  question: {
+    text: 'string',
+    data: {}, // Variables for the problem
+    requiredFormulas: ['PV = FV/(1+r)^n'],
+    estimatedTime: 120 // seconds
+  },
+  
+  answer: {
+    value: number,
+    tolerance: 0.01, // 1% tolerance
+    unit: '$|%|years',
+    alternativeFormats: [] // e.g., [6.5, 0.065, "6.5%"]
+  },
+  
+  hints: [
+    { level: 1, text: "Start with the PV formula" },
+    { level: 2, text: "FV = $10,000, r = 6%, n = 5" },
+    { level: 3, text: "PV = 10000 / (1.06)^5" }
+  ],
+  
+  solution: {
+    steps: [
+      { text: "Identify knowns", latex: null },
+      { text: "Apply formula", latex: "PV = \\frac{10000}{(1+0.06)^5}" },
+      { text: "Calculate", latex: "PV = \\frac{10000}{1.3382} = 7472.58" }
+    ],
+    concepts: ['time_value', 'discounting'],
+    commonErrors: ['Using n in months vs years', 'Wrong interest rate format']
+  },
+  
+  metadata: {
+    source: 'generated|textbook|past_exam',
+    created: Date,
+    usage: { shown: 0, correct: 0, avgTime: 0 }
+  }
+};
+```
+
+### 🔄 Progress Tracking Logic
+
+```javascript
+class ProgressTracker {
+  constructor(userId) {
+    this.userId = userId;
+    this.data = this.loadFromStorage() || this.initializeProgress();
+  }
+  
+  updateDiagnosticResults(topic, score, questions) {
+    this.data.diagnostic[topic] = {
+      score,
+      questions,
+      timestamp: Date.now(),
+      weakAreas: this.identifyWeakAreas(questions)
+    };
+    this.generateStudyPlan();
+    this.save();
+  }
+  
+  unlockModule(topic) {
+    if (this.data.diagnostic[topic].score < 0.7) {
+      this.data.modules[topic].status = 'available';
+      this.data.modules[topic].priority = 'high';
+    }
+  }
+  
+  canAccessDrills(topic) {
+    const module = this.data.modules[topic];
+    return module.contentViewed || module.practiceScore > 0;
+  }
+  
+  generateDrillQuestions() {
+    const topics = this.getAccessibleTopics();
+    const distribution = {
+      weak: this.selectWeakAreaQuestions(3),      // 60%
+      recent: this.selectRecentQuestions(1),       // 20%
+      random: this.selectRandomReview(1)          // 20%
+    };
+    return this.shuffleQuestions(distribution);
+  }
+  
+  calculateMastery() {
+    const weights = {
+      diagnostic: 0.2,
+      practice: 0.3,
+      competency: 0.4,
+      drills: 0.1
+    };
+    // Weighted calculation across all topics
+    return this.computeWeightedScore(weights);
+  }
+}
+```
+
+---
+
+## 5. AI Integration Points {#ai-integration}
+
+### 🤖 Claude API Integration
+
+```javascript
+class AIAssistant {
+  constructor(apiKey) {
+    this.client = new Claude({ apiKey });
+    this.context = this.loadFinanceContext();
+  }
+  
+  async generateHint(problem, studentAttempt, hintLevel) {
+    const prompt = `
+      Student is solving: ${problem.question}
+      Their attempt: ${studentAttempt}
+      Correct answer: ${problem.answer}
+      
+      Provide a level ${hintLevel} hint:
+      Level 1: Remind of relevant formula
+      Level 2: Show how to set up the problem
+      Level 3: Walk through first calculation step
+      
+      Keep it concise and educational.
+    `;
+    
+    return await this.client.complete(prompt);
+  }
+  
+  async explainSolution(problem, studentAnswer) {
+    const prompt = `
+      Problem: ${problem.question}
+      Student answered: ${studentAnswer}
+      Correct answer: ${problem.answer}
+      
+      Explain why their answer is incorrect and walk through 
+      the correct solution step-by-step. Reference common 
+      mistakes if applicable.
+    `;
+    
+    return await this.client.complete(prompt);
+  }
+  
+  async generatePracticeVariant(problem) {
+    const prompt = `
+      Create a similar problem to: ${JSON.stringify(problem)}
+      
+      Requirements:
+      - Same concept and difficulty
+      - Different numbers
+      - Realistic financial scenario
+      - Include full solution
+    `;
+    
+    return await this.client.complete(prompt);
+  }
+  
+  async personalizedRecommendation(performanceData) {
+    const prompt = `
+      Student performance:
+      ${JSON.stringify(performanceData)}
+      
+      Provide:
+      1. Key strengths (2-3 points)
+      2. Areas needing work (2-3 points)
+      3. Specific study recommendations
+      4. Suggested practice focus for tomorrow
+    `;
+    
+    return await this.client.complete(prompt);
+  }
+}
+```
+
+### 🎯 Adaptive Learning Algorithm
+
+```javascript
+class AdaptiveLearning {
+  constructor(studentProfile) {
+    this.profile = studentProfile;
+    this.difficultyLevel = this.calculateInitialDifficulty();
+  }
+  
+  selectNextProblem(topic) {
+    const recentPerformance = this.getRecentPerformance(topic, 5);
+    
+    if (recentPerformance.accuracy > 0.9) {
+      this.difficultyLevel = Math.min(3, this.difficultyLevel + 0.2);
+    } else if (recentPerformance.accuracy < 0.6) {
+      this.difficultyLevel = Math.max(1, this.difficultyLevel - 0.2);
+    }
+    
+    // Select problem based on:
+    // 1. Current difficulty level
+    // 2. Subtopics not recently seen
+    // 3. Problem types with lowest success rate
+    // 4. Spaced repetition schedule
+    
+    return this.problemBank.selectOptimal({
+      topic,
+      difficulty: this.difficultyLevel,
+      avoidRecent: this.recentProblemIds,
+      prioritizeWeak: this.weakSubtopics,
+      spacedRepetition: this.getSpacedRepetitionDue()
+    });
+  }
+  
+  updateSpacedRepetition(problemId, correct) {
+    const interval = this.calculateInterval(problemId, correct);
+    this.schedule[problemId] = {
+      nextReview: Date.now() + interval,
+      strength: this.updateStrength(problemId, correct)
+    };
+  }
+}
+```
+
+---
+
+## 6. Development Timeline {#timeline}
+
+### Core Infrastructure**
+- Set up Replit project structure
+- Create HTML skeleton with all views
+- Implement basic navigation and routing
+- Set up localStorage for progress saving
+
+**Diagnostic System**
+- Build diagnostic test engine
+- Create problem display/input components
+- Implement scoring and results analysis
+- Generate initial study plan logic
+
+**First Module**
+- Complete PV & Amortization module
+- Create content delivery system
+- Build practice problem engine
+- Implement competency testing
+
+###
+**Remaining Modules**
+- Portfolio Theory & Risk module
+- Bond Valuation module
+- Financial Statements modules
+- Ensure consistent quality
+
+- Connect Claude, OpenAI, and Perplexity API
+- Implement hint system
+- Add solution explanations
+- Create adaptive algorithms
+
+- Morning drill system
+- Performance analytics
+- UI/UX improvements
+- Cross-browser testing
+
+---
+
+## 7. Deployment Strategy {#deployment}
+
+### 🚀 Replit Deployment Steps
+
+```bash
+# 1. Initial Setup
+Create new Replit → Import from GitHub → Configure .replit
+
+# 2. Environment Configuration
+## .replit file
+run = "python -m http.server 8000"
+language = "html"
+
+[nix]
+channel = "stable-21_11"
+
+## replit.nix
+{ pkgs }: {
+  deps = [
+    pkgs.nodejs-16_x
+    pkgs.python39
+  ];
+}
+
+# 3. API Keys (Secrets)
+CLAUDE_API_KEY=sk-ant-...
+ANALYTICS_KEY=...
+OpenAI_API_KEY
+
+
+### 📊 Launch Checklist
+
+```markdown
+## Pre-Launch
+- [ ] All 5 modules complete with content
+- [ ] 500+ problems loaded and tested
+- [ ] Progress saving verified across sessions
+- [ ] AI features tested with rate limits
+- [ ] Mobile responsive design confirmed
+
+## Launch Day
+- [ ] Quick start guide published
+- [ ] Analytics tracking enabled
+- [ ] Backup system configured
+```
+
+### 🔄 Continuous Improvement
+
+```javascript
+// Analytics to track
+const Analytics = {
+  userMetrics: {
+    dailyActiveUsers: count,
+    avgSessionLength: minutes,
+    moduleCompletionRate: percentage,
+    diagnosticToCompleteTime: days
+  },
+  
+  learningMetrics: {
+    avgScoreImprovement: percentage,
+    problemSuccessRates: byTopic,
+    hintUsagePatterns: frequency,
+    strugglingConcepts: ranked
+  },
+  
+  systemMetrics: {
+    apiResponseTime: ms,
+    errorRate: percentage,
+    problemLoadTime: ms,
+    saveFailures: count
+  }
+};
+```
+
+This comprehensive system will give your students the best possible preparation for the Kellogg ACF exam while providing engaging, adaptive learning throughout their journey.

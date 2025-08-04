@@ -1,0 +1,264 @@
+# Replit Agent Prompt
+
+## Main Prompt for Replit Agent:
+
+```
+Create a comprehensive Advanced Corporate Finance (ACF) Learning Platform with the following specifications:
+
+PROJECT NAME: ACF Mastery Platform
+
+TECHNOLOGY STACK:
+- Node.js with Express.js
+- React (via CDN for simplicity)
+- Replit Database for persistence
+- Replit Auth for user management
+
+CORE FEATURES:
+1. Interactive learning modules covering:
+   - Time Value of Money (TVM)
+   - Portfolio Theory & Risk
+   - Bonds & Fixed Income
+   - Financial Statements
+   - Excel for Finance
+   - Financial Ratios
+   - Capital Budgeting
+
+2. Practice problems with:
+   - Multiple choice questions
+   - Calculation problems
+   - Step-by-step solutions
+   - Progress tracking
+
+3. User features:
+   - Authentication and profiles
+   - Progress tracking
+   - Achievement system
+   - Personalized dashboard
+
+4. Study tools:
+   - Financial calculator
+   - Formula reference sheet
+   - Interactive examples
+   - Video lesson placeholders
+
+INITIAL SETUP:
+1. Create Express server with static file serving
+2. Set up Replit Database for user data
+3. Implement basic authentication
+4. Create API endpoints for content and progress
+5. Set up responsive design with mobile support
+
+FILE STRUCTURE:
+- index.js (Express server)
+- public/
+  - index.html (React app)
+  - style.css
+  - app.js (React components)
+- api/
+  - auth.js
+  - content.js
+  - progress.js
+- data/
+  - questions.json
+  - formulas.json
+
+The platform should auto-deploy and be immediately accessible. Focus on creating a working MVP that can be enhanced incrementally.
+```
+
+---
+
+# Detailed README.md
+
+```markdown
+# ACF Mastery Platform
+
+A comprehensive learning platform for Advanced Corporate Finance (ACF) designed to help students master financial concepts through interactive learning, practice problems, and progress tracking.
+
+## 🚀 Quick Start
+
+The platform is live at: `https://[your-repl-name].[username].repl.co`
+
+### For Students
+1. Visit the platform URL
+2. Create an account or login
+3. Start with the recommended learning path
+4. Track your progress on the dashboard
+
+### For Developers
+1. Fork this Replit
+2. The server auto-starts with `npm start`
+3. Make changes - they deploy automatically
+4. Database is managed through Replit DB
+
+## 📚 Features
+
+### Learning Modules
+- **Time Value of Money (TVM)** - Present value, future value, annuities
+- **Portfolio Theory** - Risk, return, diversification
+- **Bonds & Fixed Income** - Valuation, yields, duration
+- **Financial Statements** - Balance sheet, income statement analysis
+- **Excel Functions** - Financial modeling in Excel
+- **Ratio Analysis** - Liquidity, profitability, leverage ratios
+- **Capital Budgeting** - NPV, IRR, payback period
+
+### Interactive Features
+- 📝 **Practice Problems** - 500+ questions with detailed solutions
+- 🧮 **Financial Calculator** - Built-in TVM and bond calculators
+- 📊 **Progress Tracking** - Visual progress bars and analytics
+- 🏆 **Achievements** - Gamification elements to motivate learning
+- 📱 **Mobile Responsive** - Learn on any device
+- 💾 **Auto-Save** - Never lose your progress
+
+## 🏗️ Architecture
+
+### Frontend
+- **React** (via CDN) - Component-based UI
+- **Tailwind CSS** - Responsive styling
+- **Local Storage** - Offline capability
+
+### Backend
+- **Express.js** - REST API server
+- **Replit Database** - User data persistence
+- **Replit Auth** - Secure authentication
+
+### API Endpoints
+
+```
+GET  /api/modules          - List all learning modules
+GET  /api/questions/:topic - Get questions for a topic
+POST /api/progress         - Save user progress
+GET  /api/user/dashboard   - Get user dashboard data
+POST /api/auth/login       - User login
+POST /api/auth/register    - User registration
+```
+
+## 📁 Project Structure
+
+```
+acf-mastery-platform/
+├── index.js              # Express server
+├── package.json          # Dependencies
+├── public/
+│   ├── index.html       # React app shell
+│   ├── style.css        # Global styles
+│   └── app.js           # React components
+├── api/
+│   ├── auth.js          # Authentication routes
+│   ├── content.js       # Content delivery
+│   └── progress.js      # Progress tracking
+├── data/
+│   ├── questions.json   # Question bank
+│   ├── formulas.json    # Formula reference
+│   └── examples.json    # Worked examples
+└── utils/
+    ├── database.js      # Replit DB helpers
+    └── validators.js    # Input validation
+```
+
+## 🔧 Configuration
+
+### Environment Variables (Replit Secrets)
+```
+SESSION_SECRET = your-secret-key
+ADMIN_PASSWORD = admin-password
+```
+
+### Database Schema
+```javascript
+// User Profile
+{
+  userId: "unique-id",
+  email: "user@email.com",
+  name: "User Name",
+  progress: {
+    tvm: { completed: 15, total: 30 },
+    portfolio: { completed: 0, total: 25 }
+  },
+  achievements: ["first_problem", "tvm_master"],
+  lastActive: "2024-01-15T10:30:00Z"
+}
+
+// Progress Entry
+{
+  userId: "unique-id",
+  questionId: "tvm_001",
+  attempts: 2,
+  correct: true,
+  timestamp: "2024-01-15T10:30:00Z"
+}
+```
+
+## 🎯 Learning Path
+
+### Recommended Sequence
+1. **Time Value of Money** (Foundation)
+2. **Financial Statements** (Analysis basics)
+3. **Ratio Analysis** (Building on statements)
+4. **Bonds & Fixed Income** (Applying TVM)
+5. **Portfolio Theory** (Risk concepts)
+6. **Capital Budgeting** (Integration)
+
+### Mastery Levels
+- 🥉 **Bronze**: Complete 60% of problems
+- 🥈 **Silver**: Complete 80% with 70% accuracy
+- 🥇 **Gold**: Complete 100% with 85% accuracy
+- 💎 **Diamond**: Perfect scores on all modules
+
+## 🛠️ Development
+
+### Adding New Content
+1. Add questions to `data/questions.json`
+2. Update module metadata in `api/content.js`
+3. Questions auto-appear in the platform
+
+### Customization
+- Styles: Edit `public/style.css`
+- Components: Modify `public/app.js`
+- Backend logic: Update API routes in `api/`
+
+### Testing
+```bash
+# No formal tests yet - PRs welcome!
+# Manual testing on Replit preview
+```
+
+## 📈 Future Enhancements
+
+- [ ] Video lessons integration
+- [ ] AI-powered tutoring
+- [ ] Peer collaboration features
+- [ ] Advanced analytics dashboard
+- [ ] Export progress reports
+- [ ] Custom practice sets
+- [ ] Spaced repetition algorithm
+- [ ] Real-world case studies
+
+## 🤝 Contributing
+
+1. Fork the Replit
+2. Create your feature branch
+3. Make changes and test
+4. Submit a pull request
+
+## 📄 License
+
+MIT License - feel free to use for educational purposes
+
+## 🙏 Acknowledgments
+
+- Kellogg School of Management
+- ACF course instructors
+- Open source community
+
+## 💡 Support
+
+- Create an issue for bugs
+- Discussions for feature requests
+- Wiki for detailed documentation
+
+---
+
+**Built with ❤️ for ACF students**
+```
+
+This prompt and README provide the Replit agent with clear instructions and comprehensive documentation to build the platform effectively. The README serves both as documentation and as additional context for the agent to understand the project requirements.
