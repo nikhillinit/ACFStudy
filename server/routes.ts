@@ -103,6 +103,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Problem routes
+  app.get('/api/problems', async (req, res) => {
+    try {
+      const { topic } = req.query;
+      const problems = topic ? 
+        await storage.getProblemsByTopic(topic as string) : 
+        await storage.getProblems();
+      res.json(problems);
+    } catch (error) {
+      console.error("Error fetching problems:", error);
+      res.status(500).json({ message: "Failed to fetch problems" });
+    }
+  });
+
+  app.get('/api/problems/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const problem = await storage.getProblem(id);
+      if (!problem) {
+        return res.status(404).json({ message: "Problem not found" });
+      }
+      res.json(problem);
+    } catch (error) {
+      console.error("Error fetching problem:", error);
+      res.status(500).json({ message: "Failed to fetch problem" });
+    }
+  });
+
+  // Diagnostic routes
+  app.post('/api/diagnostic', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resultData = { ...req.body, userId };
+      const result = await storage.saveDiagnosticResult(resultData);
+      res.json(result);
+    } catch (error) {
+      console.error("Error saving diagnostic result:", error);
+      res.status(500).json({ message: "Failed to save diagnostic result" });
+    }
+  });
+
+  app.get('/api/diagnostic/:userId', isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const results = await storage.getUserDiagnosticResults(userId);
+      res.json(results);
+    } catch (error) {
+      console.error("Error fetching diagnostic results:", error);
+      res.status(500).json({ message: "Failed to fetch diagnostic results" });
+    }
+  });
+
+  // Practice session routes
+  app.post('/api/sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const sessionData = { ...req.body, userId };
+      const session = await storage.createPracticeSession(sessionData);
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating practice session:", error);
+      res.status(500).json({ message: "Failed to create practice session" });
+    }
+  });
+
+  app.get('/api/sessions/:userId', isAuthenticated, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const sessions = await storage.getUserPracticeSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching practice sessions:", error);
+      res.status(500).json({ message: "Failed to fetch practice sessions" });
+    }
+  });
+
   // User session routes
   app.post('/api/sessions', isAuthenticated, async (req: any, res) => {
     try {

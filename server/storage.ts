@@ -3,12 +3,21 @@ import {
   progress,
   modules,
   userSessions,
+  problems,
+  diagnosticResults,
+  practiceSessions,
   type User,
   type UpsertUser,
   type InsertProgress,
   type Progress,
   type Module,
   type UserSession,
+  type Problem,
+  type InsertProblem,
+  type DiagnosticResult,
+  type InsertDiagnosticResult,
+  type PracticeSession,
+  type InsertPracticeSession,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -28,6 +37,20 @@ export interface IStorage {
   // Module operations
   getAllModules(): Promise<Module[]>;
   getModule(id: string): Promise<Module | undefined>;
+  
+  // Problem operations
+  getProblems(): Promise<Problem[]>;
+  getProblemsByTopic(topic: string): Promise<Problem[]>;
+  getProblem(id: string): Promise<Problem | undefined>;
+  createProblem(problem: InsertProblem): Promise<Problem>;
+  
+  // Diagnostic operations
+  saveDiagnosticResult(result: InsertDiagnosticResult): Promise<DiagnosticResult>;
+  getUserDiagnosticResults(userId: string): Promise<DiagnosticResult[]>;
+  
+  // Practice session operations
+  createPracticeSession(session: InsertPracticeSession): Promise<PracticeSession>;
+  getUserPracticeSessions(userId: string): Promise<PracticeSession[]>;
   
   // Session operations
   createUserSession(userId: string): Promise<UserSession>;
@@ -129,6 +152,53 @@ export class DatabaseStorage implements IStorage {
       .from(modules)
       .where(eq(modules.id, id));
     return module;
+  }
+
+  // Problem operations
+  async getProblems(): Promise<Problem[]> {
+    return await db.select().from(problems).where(eq(problems.isActive, "true"));
+  }
+
+  async getProblemsByTopic(topic: string): Promise<Problem[]> {
+    return await db.select()
+      .from(problems)
+      .where(and(eq(problems.topic, topic), eq(problems.isActive, "true")));
+  }
+
+  async getProblem(id: string): Promise<Problem | undefined> {
+    const [problem] = await db.select().from(problems).where(eq(problems.id, id));
+    return problem;
+  }
+
+  async createProblem(problemData: InsertProblem): Promise<Problem> {
+    const [problem] = await db.insert(problems).values(problemData).returning();
+    return problem;
+  }
+
+  // Diagnostic operations
+  async saveDiagnosticResult(resultData: InsertDiagnosticResult): Promise<DiagnosticResult> {
+    const [result] = await db.insert(diagnosticResults).values(resultData).returning();
+    return result;
+  }
+
+  async getUserDiagnosticResults(userId: string): Promise<DiagnosticResult[]> {
+    return await db.select()
+      .from(diagnosticResults)
+      .where(eq(diagnosticResults.userId, userId))
+      .orderBy(desc(diagnosticResults.completed));
+  }
+
+  // Practice session operations
+  async createPracticeSession(sessionData: InsertPracticeSession): Promise<PracticeSession> {
+    const [session] = await db.insert(practiceSessions).values(sessionData).returning();
+    return session;
+  }
+
+  async getUserPracticeSessions(userId: string): Promise<PracticeSession[]> {
+    return await db.select()
+      .from(practiceSessions)
+      .where(eq(practiceSessions.userId, userId))
+      .orderBy(desc(practiceSessions.completed));
   }
 
   // Session operations

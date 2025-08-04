@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
+import Practice from "@/pages/practice";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -18,6 +19,9 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/practice/:topic">
+            {(params) => <Practice topic={params.topic} />}
+          </Route>
           {/* Add more authenticated routes here as needed */}
         </>
       )}
