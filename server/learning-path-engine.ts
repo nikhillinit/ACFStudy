@@ -2,6 +2,15 @@
 import { replitDbManager } from './replit-db';
 import { aiServices } from './ai-services';
 
+// Enhanced problem database from deployment package
+const ENHANCED_PROBLEM_DATABASE = {
+  'Time Value of Money': 25,
+  'Portfolio Theory': 25, 
+  'Bond Valuation': 25,
+  'Financial Statements': 15,
+  'Derivatives': 25
+};
+
 interface UserProfile {
   id: string;
   learningStyle: 'visual' | 'analytical' | 'practical' | 'mixed';
@@ -186,6 +195,9 @@ export class LearningPathEngine {
     
     Object.keys(this.topicDifficulty).forEach(topic => {
       let priority = 0;
+      const topicProgress = progress[topic] || { completed: [], accuracy: 0 };
+      const problemCount = ENHANCED_PROBLEM_DATABASE[topic as keyof typeof ENHANCED_PROBLEM_DATABASE] || 20;
+      const completionRate = topicProgress.completed.length / problemCount;
       
       // Base priority on difficulty vs user level
       const topicDiff = this.topicDifficulty[topic as keyof typeof this.topicDifficulty];
@@ -196,13 +208,18 @@ export class LearningPathEngine {
         priority += 100;
       }
       
-      // Higher priority for weak areas
-      if (userProfile.weakAreas.includes(topic)) {
+      // Higher priority for weak areas (low accuracy or low completion)
+      if (userProfile.weakAreas.includes(topic) || topicProgress.accuracy < 0.7 || completionRate < 0.3) {
         priority += 150;
       }
       
-      // Lower priority for strong areas (but still include for reinforcement)
-      if (userProfile.strongAreas.includes(topic)) {
+      // Moderate priority for partial completion (encourage continuation)
+      if (completionRate > 0.3 && completionRate < 0.8) {
+        priority += 120;
+      }
+      
+      // Lower priority for strong areas but still include for mastery
+      if (userProfile.strongAreas.includes(topic) && topicProgress.accuracy > 0.8) {
         priority += 50;
       }
       
@@ -210,11 +227,16 @@ export class LearningPathEngine {
       const prerequisites = this.topicDependencies[topic as keyof typeof this.topicDependencies];
       const prereqsMet = prerequisites.every(prereq => {
         const prereqProgress = progress[prereq];
-        return prereqProgress && prereqProgress.accuracy > 0.6;
+        return prereqProgress && prereqProgress.accuracy > 0.6 && prereqProgress.completed.length > 0;
       });
       
       if (!prereqsMet) {
         priority -= 200; // Lower priority if prerequisites not met
+      }
+      
+      // Boost priority for topics with recent activity but low performance
+      if (topicProgress.completed.length > 0 && topicProgress.accuracy < 0.6) {
+        priority += 100; // Needs focused attention
       }
       
       priorities.push([topic, priority * levelMultiplier]);
@@ -295,37 +317,71 @@ export class LearningPathEngine {
 
   private async getAIRecommendations(userProfile: UserProfile, steps: LearningPathStep[]): Promise<string[]> {
     try {
-      const prompt = `As an expert finance tutor, provide 3 personalized study recommendations for a ${userProfile.currentLevel} student with ${userProfile.learningStyle} learning style. 
+      // Calculate completion statistics for enhanced recommendations
+      const completionStats = steps.map(step => {
+        const problemCount = ENHANCED_PROBLEM_DATABASE[step.topic as keyof typeof ENHANCED_PROBLEM_DATABASE] || 20;
+        return `${step.topic}: ${step.difficulty}/3 difficulty, ${problemCount} problems available`;
+      }).join(', ');
 
-Student Profile:
+      const prompt = `As an expert ACF tutor for Kellogg MBA students, provide 3 highly specific study recommendations for a ${userProfile.currentLevel} student preparing for Advanced Corporate Finance placement exam.
+
+Student Analysis:
 - Current Level: ${userProfile.currentLevel}
 - Learning Style: ${userProfile.learningStyle}
-- Time Available: ${userProfile.timeAvailable} minutes per session
-- Weak Areas: ${userProfile.weakAreas.join(', ') || 'None identified'}
-- Strong Areas: ${userProfile.strongAreas.join(', ') || 'None identified'}
+- Available Study Time: ${userProfile.timeAvailable} minutes per session
+- Weak Areas Needing Focus: ${userProfile.weakAreas.join(', ') || 'None identified yet'}
+- Strong Foundation Areas: ${userProfile.strongAreas.join(', ') || 'Building foundation'}
 
-Learning Path Topics: ${steps.map(s => s.topic).join(', ')}
+Learning Path Design: ${completionStats}
 
-Provide specific, actionable recommendations for study strategy, focus areas, and learning techniques.`;
+Problem Database Available: 115+ practice problems across 5 core ACF topics with adaptive difficulty progression.
+
+Provide strategic recommendations focusing on:
+1. Optimal study sequence and time allocation
+2. Specific problem-solving strategies for weak areas
+3. Advanced techniques for mastering challenging concepts
+
+Make recommendations practical and actionable for busy MBA students.`;
 
       const recommendations = await aiServices.getPersonalizedTutoring({
-        topic: 'Study Strategy',
+        topic: 'ACF Study Strategy',
         userLevel: userProfile.currentLevel,
         specificQuestion: prompt
       });
 
-      // Parse AI response into individual recommendations
-      return recommendations.split('\n')
-        .filter(line => line.trim().length > 0)
+      // Parse and enhance AI response
+      const parsed = recommendations.split('\n')
+        .filter(line => line.trim().length > 0 && !line.trim().startsWith('As an') && !line.trim().startsWith('Based on'))
         .slice(0, 3)
-        .map(rec => rec.replace(/^\d+\.\s*/, '').trim());
+        .map(rec => rec.replace(/^\d+\.\s*/, '').replace(/^-\s*/, '').trim())
+        .filter(rec => rec.length > 20); // Filter out very short responses
+
+      if (parsed.length >= 3) {
+        return parsed;
+      }
+
+      // Fallback to enhanced default recommendations
+      const fallbackRecs = [
+        `For ${userProfile.learningStyle} learners: Focus on ${userProfile.learningStyle === 'visual' ? 'diagram-based problem solving and chart analysis' : 
+          userProfile.learningStyle === 'analytical' ? 'step-by-step formula derivations and logical problem breakdowns' : 
+          userProfile.learningStyle === 'practical' ? 'real-world application examples and case-based learning' : 
+          'multi-modal approach combining visual aids, logical reasoning, and practical applications'}`,
+        
+        userProfile.weakAreas.length > 0 ? 
+          `Dedicate 60% of study time to weak areas: ${userProfile.weakAreas.join(' and ')}. Use spaced repetition with 3-day intervals for maximum retention` :
+          `Build strong foundation by completing all fundamental problems in Time Value of Money before advancing to Portfolio Theory`,
+        
+        `Optimize ${userProfile.timeAvailable}-minute sessions: 5 min review, ${userProfile.timeAvailable - 15} min new problems, 10 min solution analysis. Track accuracy trends to identify improvement patterns`
+      ];
+
+      return fallbackRecs;
         
     } catch (error) {
       console.error('Error getting AI recommendations:', error);
       return [
-        'Focus on understanding core concepts before moving to advanced topics',
-        'Practice regularly with consistent study sessions',
-        'Review and reinforce areas where you scored below 70%'
+        `Structured approach for ${userProfile.currentLevel} level: Master fundamental concepts before advancing to complex applications`,
+        `${userProfile.timeAvailable}-minute sessions work best with focused practice on 1-2 concepts per session rather than broad coverage`,
+        `Track progress weekly: aim for 80%+ accuracy before moving to next difficulty level in each topic area`
       ];
     }
   }
@@ -404,7 +460,7 @@ Provide specific, actionable recommendations for study strategy, focus areas, an
     if (recentSessions.length < 3) return; // Need sufficient data for adaptation
     
     // Analyze if adaptation is needed
-    const avgAccuracy = recentSessions.reduce((sum, session) => sum + session.accuracy, 0) / recentSessions.length;
+    const avgAccuracy = recentSessions.reduce((sum: number, session: any) => sum + session.accuracy, 0) / recentSessions.length;
     
     if (avgAccuracy > 0.9) {
       // User performing very well, can increase difficulty

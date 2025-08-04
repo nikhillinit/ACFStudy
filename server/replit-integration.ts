@@ -7,6 +7,7 @@ import { replitAuthManager, requireAuth, optionalAuth, authLimiter, apiLimiter, 
 import { replitDbManager } from "./replit-db";
 import { aiServices } from "./ai-services";
 import { learningPathEngine } from "./learning-path-engine";
+import { ENHANCED_MODULES, getModuleById, calculateModuleProgress } from "./enhanced-modules";
 
 // Helper function to calculate study streak
 function calculateStudyStreak(events: any[]): number {
@@ -39,6 +40,9 @@ function calculateStudyStreak(events: any[]): number {
 }
 
 export async function registerReplitRoutes(app: Express): Promise<Server> {
+  // Set trust proxy for Replit environment to fix rate limiting warnings
+  app.set("trust proxy", true);
+  
   // Enhanced security middleware
   app.use(helmet({
     contentSecurityPolicy: {
@@ -139,21 +143,35 @@ export async function registerReplitRoutes(app: Express): Promise<Server> {
 
   app.get('/api/modules', optionalAuth(replitAuthManager), async (req: any, res) => {
     try {
-      const modules = await replitDbManager.getModules();
+      const modules = ENHANCED_MODULES.map(module => ({
+        id: module.id,
+        title: module.title,
+        description: module.description,
+        category: module.category,
+        difficulty: module.difficulty,
+        problemCount: module.problemCount,
+        estimatedTime: module.estimatedTime,
+        prerequisites: module.prerequisites,
+        learningObjectives: module.learningObjectives.slice(0, 3), // Show first 3 objectives
+        keyFormulas: module.keyFormulas.length,
+        applications: module.realWorldApplications.length
+      }));
       
       // Add user progress if authenticated
       if (req.user) {
         const progress = await replitDbManager.getProgress(req.user.id) || {};
         modules.forEach((module: any) => {
-          const topicProgress = progress[module.title] || { completed: [], accuracy: 0 };
+          const moduleProgress = calculateModuleProgress(module.id, progress);
           module.userProgress = {
-            completed: topicProgress.completed.length,
-            accuracy: Math.round(topicProgress.accuracy * 100)
+            completed: moduleProgress.problemsCompleted,
+            accuracy: moduleProgress.accuracy,
+            completionRate: moduleProgress.completionRate,
+            estimatedTimeRemaining: moduleProgress.estimatedTimeRemaining
           };
         });
       }
       
-      res.json(modules);
+      res.json({ success: true, modules });
     } catch (error) {
       console.error("Error fetching modules:", error);
       res.status(500).json({ message: "Failed to fetch modules" });

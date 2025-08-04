@@ -28,6 +28,7 @@ import {
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { AITutor } from "@/components/ai-tutor";
 import { LearningPathDashboard } from "@/components/learning-path";
+import { EnhancedModulesView } from "@/components/enhanced-modules";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -215,8 +216,9 @@ export default function Home() {
 
         {/* Learning Platform Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="modules">Enhanced Modules</TabsTrigger>
             <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
             <TabsTrigger value="practice">Practice</TabsTrigger>
             <TabsTrigger value="diagnostic">Diagnostic</TabsTrigger>
@@ -279,6 +281,11 @@ export default function Home() {
                 );
               })}
             </div>
+          </TabsContent>
+
+          {/* Enhanced Modules Tab */}
+          <TabsContent value="modules" className="space-y-6">
+            <EnhancedModulesView />
           </TabsContent>
 
           {/* Learning Path Tab */}
