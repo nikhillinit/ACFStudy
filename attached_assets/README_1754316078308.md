@@ -1,0 +1,64 @@
+# ACF Learning Modules Integration Guide
+
+## 🎯 Overview
+Complete learning management system for ACF Mastery Platform with video lectures, interactive content, and adaptive learning.
+
+## 📁 Folder Structure
+```
+learning-modules/
+├── README.md                    # This file
+├── content/                     # Learning content by topic
+│   ├── videos/                  # Video metadata and playlists
+│   ├── readings/                # Interactive text lessons
+│   ├── exercises/               # Hands-on practice problems
+│   └── assessments/             # Quizzes and evaluations
+├── components/                  # React/JS components
+├── legacy/                      # Migrated existing content
+├── assets/                      # Images, charts, diagrams
+└── integration/                 # API and integration files
+```
+
+## 🚀 Quick Integration Steps
+
+### Step 1: Copy to Replit
+1. Upload this entire `learning-modules` folder to your Replit project
+2. Place it at the root level (same level as `public/`)
+
+### Step 2: Update Your App
+1. Add learning modules route to your `index.js`:
+```javascript
+app.use('/learning', express.static('learning-modules'));
+```
+
+### Step 3: Integrate Components
+1. Copy components to your `public/` folder
+2. Import the learning module system into your main app.js
+
+### Step 4: Database Setup
+1. Run the migration script to add learning progress tables
+2. Update your user model to include learning data
+
+## 📚 Features Included
+
+- **MIT Video Integration**: 12+ finance lectures with transcripts
+- **Interactive Lessons**: Step-by-step guided learning
+- **Adaptive Quizzing**: AI-powered difficulty adjustment  
+- **Progress Analytics**: Detailed learning metrics
+- **Mobile Responsive**: Works on all devices
+- **Offline Support**: Downloadable content
+
+## 🎬 Video Library
+Integrated MIT 15.401 Finance Theory lectures:
+- Present Value Relations
+- Fixed-Income Securities
+- Portfolio Theory
+- CAPM and APT
+- And more...
+
+## 💡 Next Steps
+1. Test the integration with a single module
+2. Customize the styling to match your brand
+3. Add your own content alongside MIT materials
+4. Configure analytics and progress tracking
+
+Ready to transform your platform into a world-class learning system!

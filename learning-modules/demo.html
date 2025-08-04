@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACF Learning Modules - MIT Finance Video Library</title>
+    <link rel="stylesheet" href="components/VideoPlayer.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .features-banner {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0 auto 30px;
+            max-width: 800px;
+            color: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .feature-item h3 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-item p {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .instructions ol {
+            color: #6c757d;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .quick-action-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .quick-action-btn.secondary {
+            background: #6c757d;
+        }
+
+        .quick-action-btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        #video-player-container {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .quick-action-btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ACF Learning Modules</h1>
+        <p>Master finance concepts with MIT's world-class video lectures, interactive tools, and adaptive learning technology</p>
+    </div>
+
+    <div class="demo-container">
+        <div class="features-banner">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="icon">🎬</span>
+                    <h3>MIT Video Library</h3>
+                    <p>11 complete lectures from MIT 15.401</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">📝</span>
+                    <h3>Interactive Notes</h3>
+                    <p>Take and save notes during lectures</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">📊</span>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor your learning journey</p>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">🎯</span>
+                    <h3>ACF Exam Prep</h3>
+                    <p>Curated sequence for exam success</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>18+</h3>
+                    <p>Hours of Content</p>
+                </div>
+                <div class="stat-item">
+                    <h3>11</h3>
+                    <p>MIT Lectures</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Free Access</p>
+                </div>
+                <div class="stat-item">
+                    <h3>📱</h3>
+                    <p>Mobile Responsive</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use This Learning System</h2>
+            <ol>
+                <li><strong>Start with the Recommended Sequence:</strong> Click "Start ACF Prep" below to begin with curated lectures</li>
+                <li><strong>Browse the Complete Library:</strong> Click "Show Playlist" to explore all available videos</li>
+                <li><strong>Take Notes:</strong> Use the notes panel to capture key insights during lectures</li>
+                <li><strong>Track Progress:</strong> Watch your completion percentages grow as you learn</li>
+                <li><strong>Navigate Easily:</strong> Use Previous/Next buttons or click any video in the playlist</li>
+            </ol>
+            
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="startACFPrep()">Start ACF Prep Sequence</button>
+                <button class="quick-action-btn" onclick="showVideoLibrary()">Browse Video Library</button>
+                <button class="quick-action-btn secondary" onclick="startTVMModule()">Time Value of Money</button>
+                <button class="quick-action-btn secondary" onclick="startPortfolioModule()">Portfolio Theory</button>
+            </div>
+        </div>
+
+        <div id="video-player-container">
+            <!-- VideoPlayer will be initialized here -->
+        </div>
+    </div>
+
+    <script src="components/VideoPlayer.js"></script>
+    <script>
+        let videoPlayer;
+
+        // Initialize the video player when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            videoPlayer = new VideoPlayer('video-player-container', {
+                width: '100%',
+                height: '500px',
+                showTranscript: true,
+                showNotes: true,
+                autoplay: false
+            });
+
+            // Add some demo progress data
+            setTimeout(() => {
+                addDemoProgress();
+            }, 2000);
+        });
+
+        // Quick action functions
+        function startACFPrep() {
+            videoPlayer.loadPlaylist('acf-exam-prep');
+            scrollToPlayer();
+        }
+
+        function showVideoLibrary() {
+            videoPlayer.togglePlaylist();
+        }
+
+        function startTVMModule() {
+            videoPlayer.loadPlaylist('time-value-money');
+            scrollToPlayer();
+        }
+
+        function startPortfolioModule() {
+            videoPlayer.loadPlaylist('portfolio-management');
+            scrollToPlayer();
+        }
+
+        function scrollToPlayer() {
+            setTimeout(() => {
+                document.getElementById('video-player-container').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500);
+        }
+
+        // Add some demo progress to show the system working
+        function addDemoProgress() {
+            // Simulate some watched videos
+            const demoProgress = [
+                { id: 'intro-overview', progress: 0.85 },
+                { id: 'present-value', progress: 0.60 },
+                { id: 'risk-return', progress: 0.30 }
+            ];
+
+            demoProgress.forEach(({ id, progress }) => {
+                videoPlayer.watchProgress.set(id, progress);
+                
+                // Update UI if playlist is rendered
+                const playlistItem = document.querySelector(`[data-lecture-id="${id}"]`);
+                if (playlistItem) {
+                    const progressFill = playlistItem.querySelector('.progress-fill');
+                    const progressText = playlistItem.querySelector('.progress-text');
+                    if (progressFill && progressText) {
+                        const percent = Math.round(progress * 100);
+                        progressFill.style.width = `${percent}%`;
+                        progressText.textContent = `${percent}% watched`;
+                    }
+                }
+            });
+        }
+
+        // Demo notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : '#007bff'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                font-weight: 600;
+                max-width: 300px;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Welcome message
+        setTimeout(() => {
+            showNotification('Welcome to ACF Learning Modules!', 'success');
+        }, 1000);
+
+        // Console integration guide
+        console.log(`
+ACF Learning Modules Demo
+
+This demo shows the integrated video learning system for your ACF platform.
+
+🎯 Key Features:
+- MIT 15.401 Finance Theory video library (18+ hours)
+- Interactive note-taking during lectures
+- Progress tracking with visual indicators
+- Curated playlists for ACF exam preparation
+- Mobile-responsive design
+- Fullscreen video support
+
+🚀 Integration Ready:
+This system can be integrated into your main ACF platform by:
+1. Adding the learning-modules folder to your Replit project
+2. Creating API endpoints for progress tracking
+3. Connecting to your user authentication system
+4. Customizing the styling to match your brand
+
+📊 Ready for Production:
+- Scalable video delivery via YouTube
+- Offline-capable with downloadable transcripts
+- Analytics-ready for detailed learning insights
+- Accessible design with keyboard navigation
+        `);
+    </script>
+</body>
+</html>

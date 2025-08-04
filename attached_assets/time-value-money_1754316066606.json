@@ -1,0 +1,286 @@
+{
+  "module": {
+    "id": "tvm-fundamentals",
+    "title": "Time Value of Money Fundamentals",
+    "description": "Master the core concept that money available today is worth more than the same amount in the future",
+    "estimatedTime": "45 minutes",
+    "difficulty": 1,
+    "prerequisites": [],
+    "learningObjectives": [
+      "Understand the fundamental principle of time value of money",
+      "Calculate present value and future value of cash flows",
+      "Apply discount rates and compounding",
+      "Solve real-world TVM problems",
+      "Use financial calculators and formulas effectively"
+    ],
+    "sections": [
+      {
+        "id": "introduction",
+        "title": "Why Time Value of Money Matters",
+        "type": "concept",
+        "content": {
+          "text": "The time value of money (TVM) is arguably the most important concept in finance. It states that money available at the present time is worth more than the identical sum in the future due to its potential earning capacity.",
+          "keyPoints": [
+            "A dollar today is worth more than a dollar tomorrow",
+            "Money can earn returns when invested",
+            "Inflation erodes purchasing power over time",
+            "Risk increases with time"
+          ],
+          "realWorldExample": {
+            "scenario": "Netflix Investment Decision",
+            "description": "In 2007, Netflix offered to sell itself to Blockbuster for $50 million. Blockbuster declined. By understanding TVM, we can evaluate this decision. That $50 million invested at 10% annual return would be worth about $270 million by 2023. Netflix's actual value in 2023? Over $150 billion. The time value principle shows us both the opportunity cost of Blockbuster's decision and Netflix's incredible value creation."
+          }
+        }
+      },
+      {
+        "id": "present-value",
+        "title": "Present Value: Bringing Future Money to Today",
+        "type": "calculation",
+        "content": {
+          "text": "Present Value (PV) tells us what future money is worth in today's dollars. It's the foundation of all valuation in finance.",
+          "formula": {
+            "name": "Present Value Formula",
+            "equation": "PV = FV / (1 + r)^n",
+            "variables": {
+              "PV": "Present Value",
+              "FV": "Future Value",
+              "r": "Discount rate (interest rate)",
+              "n": "Number of periods"
+            }
+          },
+          "step_by_step": [
+            {
+              "step": 1,
+              "title": "Identify the Future Value",
+              "description": "Determine the amount you will receive in the future"
+            },
+            {
+              "step": 2,
+              "title": "Determine the Discount Rate",
+              "description": "Find the appropriate interest rate or required return"
+            },
+            {
+              "step": 3,
+              "title": "Count the Periods",
+              "description": "Calculate the number of compounding periods"
+            },
+            {
+              "step": 4,
+              "title": "Apply the Formula",
+              "description": "Divide FV by (1 + r) raised to the power of n"
+            }
+          ],
+          "practiceProblems": [
+            {
+              "id": "pv_basic",
+              "question": "You will receive $10,000 in 5 years. If the discount rate is 8%, what is the present value?",
+              "given": {
+                "FV": 10000,
+                "r": 0.08,
+                "n": 5
+              },
+              "solution": {
+                "calculation": "PV = $10,000 / (1.08)^5 = $10,000 / 1.469 = $6,806",
+                "answer": "$6,806",
+                "explanation": "The present value of $10,000 received in 5 years at 8% discount rate is $6,806. This means you should be indifferent between receiving $6,806 today or $10,000 in 5 years."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "future-value",
+        "title": "Future Value: Growing Today's Money",
+        "type": "calculation",
+        "content": {
+          "text": "Future Value (FV) shows how much today's money will be worth at a future date, assuming a specific rate of return.",
+          "formula": {
+            "name": "Future Value Formula",
+            "equation": "FV = PV × (1 + r)^n",
+            "variables": {
+              "FV": "Future Value",
+              "PV": "Present Value",
+              "r": "Interest rate per period",
+              "n": "Number of periods"
+            }
+          },
+          "compoundingConcept": {
+            "title": "The Power of Compounding",
+            "description": "Compounding occurs when you earn returns not just on your initial investment, but also on the returns from previous periods. Einstein allegedly called it 'the eighth wonder of the world.'",
+            "visualization": {
+              "type": "table",
+              "data": {
+                "headers": ["Year", "Beginning Balance", "Interest Earned", "Ending Balance"],
+                "rows": [
+                  ["1", "$1,000", "$100", "$1,100"],
+                  ["2", "$1,100", "$110", "$1,210"],
+                  ["3", "$1,210", "$121", "$1,331"],
+                  ["4", "$1,331", "$133", "$1,464"],
+                  ["5", "$1,464", "$146", "$1,610"]
+                ]
+              },
+              "note": "Notice how the interest earned grows each year because you're earning interest on interest!"
+            }
+          },
+          "practiceProblems": [
+            {
+              "id": "fv_compound",
+              "question": "If you invest $5,000 today at 12% annual interest, compounded annually, how much will you have in 10 years?",
+              "given": {
+                "PV": 5000,
+                "r": 0.12,
+                "n": 10
+              },
+              "solution": {
+                "calculation": "FV = $5,000 × (1.12)^10 = $5,000 × 3.106 = $15,529",
+                "answer": "$15,529",
+                "explanation": "Your $5,000 investment will grow to $15,529 in 10 years, representing a gain of $10,529 due to compound interest."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "discount-rates",
+        "title": "Understanding Discount Rates",
+        "type": "concept",
+        "content": {
+          "text": "The discount rate is the interest rate used to determine the present value of future cash flows. Choosing the right discount rate is crucial for accurate valuation.",
+          "factors": [
+            {
+              "name": "Risk-Free Rate",
+              "description": "The return on a risk-free investment, typically U.S. Treasury bonds",
+              "example": "Current 10-year Treasury yield: ~4.5%"
+            },
+            {
+              "name": "Risk Premium",
+              "description": "Additional return required to compensate for risk",
+              "example": "Corporate bonds might require 2-3% above Treasury rates"
+            },
+            {
+              "name": "Inflation Expectations",
+              "description": "Expected rate of price increases over time",
+              "example": "Fed targets 2% annual inflation"
+            },
+            {
+              "name": "Opportunity Cost",
+              "description": "Return you could earn on alternative investments of similar risk",
+              "example": "If you could earn 8% elsewhere, use 8% as discount rate"
+            }
+          ],
+          "ruleOfThumb": {
+            "title": "Typical Discount Rates by Investment Type",
+            "rates": {
+              "Government Bonds": "3-5%",
+              "Corporate Bonds": "4-8%",
+              "Real Estate": "6-10%",
+              "Stock Market": "8-12%",
+              "Startup Investments": "15-25%"
+            }
+          }
+        }
+      },
+      {
+        "id": "applications",
+        "title": "Real-World TVM Applications",
+        "type": "application",
+        "content": {
+          "text": "Time value of money principles appear everywhere in finance and life. Here are key applications:",
+          "scenarios": [
+            {
+              "title": "Retirement Planning",
+              "problem": "How much do I need to save monthly to have $1 million at retirement?",
+              "approach": "Use present value of annuity formulas to determine required monthly contributions",
+              "example": "To accumulate $1M in 30 years at 8% return, you need to save approximately $670 per month"
+            },
+            {
+              "title": "Loan Payments",
+              "problem": "What will my monthly mortgage payment be?",
+              "approach": "The loan amount is the present value of all future payments",
+              "example": "$400,000 loan at 6% for 30 years = $2,398 monthly payment"
+            },
+            {
+              "title": "Investment Decisions",
+              "problem": "Should I invest in Project A or Project B?",
+              "approach": "Calculate net present value (NPV) of each project's cash flows",
+              "example": "Choose the project with higher positive NPV"
+            },
+            {
+              "title": "Stock Valuation",
+              "problem": "What is a stock worth?",
+              "approach": "Present value of expected future dividends and capital gains",
+              "example": "Dividend discount model uses TVM to value stocks"
+            }
+          ]
+        }
+      },
+      {
+        "id": "common-mistakes",
+        "title": "Common TVM Mistakes to Avoid",
+        "type": "warning",
+        "content": {
+          "text": "Even experienced professionals make these TVM errors. Learn to spot and avoid them:",
+          "mistakes": [
+            {
+              "mistake": "Mixing Nominal and Real Rates",
+              "description": "Using nominal interest rates with real cash flows or vice versa",
+              "solution": "Always match: nominal rates with nominal cash flows, real rates with real cash flows"
+            },
+            {
+              "mistake": "Wrong Compounding Frequency",
+              "description": "Assuming annual compounding when it's monthly or daily",
+              "solution": "Adjust both the rate and number of periods for compounding frequency"
+            },
+            {
+              "mistake": "Forgetting Cash Flow Timing",
+              "description": "Not accounting for when cash flows actually occur",
+              "solution": "Map out exact timing of all cash flows on a timeline"
+            },
+            {
+              "mistake": "Using Inappropriate Discount Rates",
+              "description": "Applying the same rate to all cash flows regardless of risk",
+              "solution": "Match discount rates to the riskiness of each cash flow"
+            }
+          ]
+        }
+      }
+    ],
+    "assessment": {
+      "questions": [
+        {
+          "id": "tvm_concept",
+          "type": "multiple_choice",
+          "question": "Which statement best explains why a dollar today is worth more than a dollar in the future?",
+          "options": [
+            "Inflation always increases prices",
+            "Money can be invested to earn returns",
+            "Future income is always uncertain",
+            "Banks charge interest on loans"
+          ],
+          "correct": 1,
+          "explanation": "While inflation and uncertainty play roles, the primary reason is that money can be invested to earn returns, creating opportunity cost for waiting."
+        },
+        {
+          "id": "pv_calculation",
+          "type": "calculation",
+          "question": "What is the present value of $50,000 received in 8 years if the discount rate is 9%?",
+          "answer": 25084,
+          "tolerance": 100,
+          "solution": "PV = $50,000 / (1.09)^8 = $50,000 / 1.993 = $25,084"
+        }
+      ]
+    },
+    "resources": {
+      "videos": ["intro-overview", "present-value"],
+      "readings": ["acf-study-guide-tvm"],
+      "tools": ["tvm-calculator", "compound-interest-simulator"],
+      "external": [
+        {
+          "title": "Khan Academy: Present Value",
+          "url": "https://www.khanacademy.org/economics-finance-domain/core-finance/interest-and-debt/present-value/v/time-value-of-money",
+          "type": "video"
+        }
+      ]
+    }
+  }
+}

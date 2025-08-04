@@ -313,6 +313,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Learning modules routes
+  app.use('/learning-modules', express.static('learning-modules'));
+  
+  // API endpoints for learning modules
+  app.get('/api/learning/videos', async (req, res) => {
+    try {
+      const fs = await import('fs').then(m => m.promises);
+      const path = await import('path');
+      const videoLibraryPath = path.join(process.cwd(), 'learning-modules/content/videos/mit-finance-library.json');
+      const videoData = await fs.readFile(videoLibraryPath, 'utf-8');
+      res.json(JSON.parse(videoData));
+    } catch (error) {
+      console.error('Error loading video library:', error);
+      res.status(500).json({ error: 'Failed to load video library' });
+    }
+  });
+
+  app.get('/api/learning/content/:topic', async (req, res) => {
+    try {
+      const { topic } = req.params;
+      const fs = await import('fs').then(m => m.promises);
+      const path = await import('path');
+      const contentPath = path.join(process.cwd(), `learning-modules/content/readings/${topic}.json`);
+      const contentData = await fs.readFile(contentPath, 'utf-8');
+      res.json(JSON.parse(contentData));
+    } catch (error) {
+      console.error(`Error loading content for ${req.params.topic}:`, error);
+      res.status(404).json({ error: 'Content not found' });
+    }
+  });
+
+  // Learning progress tracking
+  app.post('/api/learning/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { lectureId, progress, completed } = req.body;
+      
+      // In a real implementation, save to database
+      // For now, just return success
+      res.json({ 
+        success: true, 
+        message: 'Progress updated',
+        data: { userId, lectureId, progress, completed }
+      });
+    } catch (error) {
+      console.error('Error updating learning progress:', error);
+      res.status(500).json({ error: 'Failed to update progress' });
+    }
+  });
+
+  app.get('/api/learning/progress/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.params.userId;
+      const requestingUserId = req.user?.claims?.sub;
+      
+      // Users can only access their own progress
+      if (userId !== requestingUserId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      // In a real implementation, fetch from database
+      // For now, return mock progress data
+      const mockProgress = {
+        'intro-overview': { progress: 0.85, completed: false, watchTime: 3600 },
+        'present-value': { progress: 0.60, completed: false, watchTime: 2950 },
+        'risk-return': { progress: 0.30, completed: false, watchTime: 1580 }
+      };
+      
+      res.json(mockProgress);
+    } catch (error) {
+      console.error('Error fetching learning progress:', error);
+      res.status(500).json({ error: 'Failed to fetch progress' });
+    }
+  });
+
   // Health Check Route
   app.get('/api/health', async (req, res) => {
     try {

@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Practice from "@/pages/practice";
+import Learning from "@/pages/learning";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -20,6 +21,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/practice" component={Practice} />
+          <Route path="/learning" component={Learning} />
           {/* Add more authenticated routes here as needed */}
         </>
       )}

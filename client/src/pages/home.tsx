@@ -238,6 +238,13 @@ export default function Home() {
                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </Link>
+            <Link href="/learning">
+              <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-learning-modules">
+                <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm">Video Lectures</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            </Link>
             <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-ai-tutor" onClick={() => setShowAITutor(true)}>
               <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
               <span className="text-xs sm:text-sm">AI Tutor</span>
@@ -245,10 +252,6 @@ export default function Home() {
             <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-quick-diagnostic">
               <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
               <span className="text-xs sm:text-sm">Diagnostic</span>
-            </Button>
-            <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3 sm:py-4" data-testid="button-formulas">
-              <Calculator className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="text-xs sm:text-sm">Formulas</span>
             </Button>
           </div>
         </div>
