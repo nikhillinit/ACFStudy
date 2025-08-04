@@ -1,0 +1,225 @@
+{
+  "library": {
+    "title": "MIT 15.401 Finance Theory I",
+    "institution": "MIT Sloan School of Management",
+    "instructor": "Andrew Lo",
+    "description": "Complete video lecture series covering fundamental finance concepts",
+    "baseUrl": "https://www.youtube.com/embed/",
+    "totalDuration": "18 hours",
+    "lectures": [
+      {
+        "id": "intro-overview",
+        "title": "Introduction and Course Overview",
+        "youtube": "HdHlfiOAJyE",
+        "duration": "1:15:00",
+        "topics": ["Course Structure", "Finance Fundamentals", "Learning Objectives"],
+        "acfTopics": ["Introduction"],
+        "difficulty": 0,
+        "transcriptUrl": "/transcripts/HdHlfiOAJyE.pdf",
+        "captionsUrl": "/captions/HdHlfiOAJyE.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/HdHlfiOAJyE/default.jpg",
+        "archiveUrl": "http://www.archive.org/download/MIT15.401F08/MIT15_401F08_ses01_300k.mp4"
+      },
+      {
+        "id": "present-value",
+        "title": "Present Value Relations",
+        "youtube": "8kFFG5jAOqC",
+        "duration": "1:22:00",
+        "topics": ["Present Value", "Future Value", "Discounting", "Time Value of Money"],
+        "acfTopics": ["Time Value of Money"],
+        "difficulty": 1,
+        "prerequisites": ["intro-overview"],
+        "transcriptUrl": "/transcripts/8kFFG5jAOqC.pdf",
+        "captionsUrl": "/captions/8kFFG5jAOqC.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/8kFFG5jAOqC/default.jpg"
+      },
+      {
+        "id": "fixed-income-part1",
+        "title": "Fixed-Income Securities Part 1",
+        "youtube": "iWA7NvEWqTO",
+        "duration": "1:18:00",
+        "topics": ["Bonds", "Yield", "Duration", "Interest Rate Risk"],
+        "acfTopics": ["Bond Valuation"],
+        "difficulty": 2,
+        "prerequisites": ["present-value"],
+        "transcriptUrl": "/transcripts/iWA7NvEWqTO.pdf",
+        "captionsUrl": "/captions/iWA7NvEWqTO.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/iWA7NvEWqTO/default.jpg"
+      },
+      {
+        "id": "fixed-income-part2", 
+        "title": "Fixed-Income Securities Part 2",
+        "youtube": "CNy-1YDbqNO",
+        "duration": "1:20:00",
+        "topics": ["Bond Pricing", "YTM", "Credit Risk", "Term Structure"],
+        "acfTopics": ["Bond Valuation"],
+        "difficulty": 2,
+        "prerequisites": ["fixed-income-part1"],
+        "transcriptUrl": "/transcripts/CNy-1YDbqNO.pdf",
+        "captionsUrl": "/captions/CNy-1YDbqNO.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/CNy-1YDbqNO/default.jpg"
+      },
+      {
+        "id": "equities-part1",
+        "title": "Equities Part 1",
+        "youtube": "4F1j5q3DiAI",
+        "duration": "1:25:00",
+        "topics": ["Stock Valuation", "Dividends", "Growth Models", "P/E Ratios"],
+        "acfTopics": ["Financial Statements", "Valuation"],
+        "difficulty": 2,
+        "prerequisites": ["present-value"],
+        "transcriptUrl": "/transcripts/4F1j5q3DiAI.pdf",
+        "captionsUrl": "/captions/4F1j5q3DiAI.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/4F1j5q3DiAI/default.jpg"
+      },
+      {
+        "id": "forwards-futures",
+        "title": "Forward and Futures Contracts",
+        "youtube": "a5pF2PCelv0",
+        "duration": "1:30:00",
+        "topics": ["Forwards", "Futures", "Arbitrage", "Cost of Carry", "Hedging"],
+        "acfTopics": ["Derivatives"],
+        "difficulty": 3,
+        "prerequisites": ["present-value", "equities-part1"],
+        "transcriptUrl": "/transcripts/a5pF2PCelv0.pdf",
+        "captionsUrl": "/captions/a5pF2PCelv0.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/a5pF2PCelv0/default.jpg"
+      },
+      {
+        "id": "options-part1",
+        "title": "Options Part 1",
+        "youtube": "HYC8h5T76bE",
+        "duration": "1:15:00",
+        "topics": ["Call Options", "Put Options", "Option Payoffs", "Intrinsic Value"],
+        "acfTopics": ["Derivatives"],
+        "difficulty": 3,
+        "prerequisites": ["forwards-futures"],
+        "transcriptUrl": "/transcripts/HYC8h5T76bE.pdf",
+        "captionsUrl": "/captions/HYC8h5T76bE.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/HYC8h5T76bE/default.jpg"
+      },
+      {
+        "id": "risk-return",
+        "title": "Risk and Return",
+        "youtube": "JE80wLNihJE",
+        "duration": "1:28:00",
+        "topics": ["Expected Return", "Variance", "Standard Deviation", "Risk Premium"],
+        "acfTopics": ["Portfolio Theory"],
+        "difficulty": 2,
+        "prerequisites": ["present-value"],
+        "transcriptUrl": "/transcripts/JE80wLNihJE.pdf",
+        "captionsUrl": "/captions/JE80wLNihJE.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/JE80wLNihJE/default.jpg"
+      },
+      {
+        "id": "portfolio-theory",
+        "title": "Portfolio Theory",
+        "youtube": "ATT59JXu9es",
+        "duration": "1:35:00",
+        "topics": ["Portfolio Optimization", "Efficient Frontier", "Diversification", "Correlation"],
+        "acfTopics": ["Portfolio Theory"],
+        "difficulty": 3,
+        "prerequisites": ["risk-return"],
+        "transcriptUrl": "/transcripts/ATT59JXu9es.pdf",
+        "captionsUrl": "/captions/ATT59JXu9es.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/ATT59JXu9es/default.jpg"
+      },
+      {
+        "id": "capm-apt",
+        "title": "The CAPM and APT",
+        "youtube": "i_pLF9j3qPE",
+        "duration": "1:40:00",
+        "topics": ["CAPM", "Beta", "Security Market Line", "APT", "Factor Models"],
+        "acfTopics": ["Portfolio Theory", "Risk Management"],
+        "difficulty": 3,
+        "prerequisites": ["portfolio-theory"],
+        "transcriptUrl": "/transcripts/i_pLF9j3qPE.pdf",
+        "captionsUrl": "/captions/i_pLF9j3qPE.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/i_pLF9j3qPE/default.jpg"
+      },
+      {
+        "id": "capital-budgeting",
+        "title": "Capital Budgeting",
+        "youtube": "j7D3vcaS9-o",
+        "duration": "1:25:00",
+        "topics": ["NPV", "IRR", "Payback Period", "Profitability Index", "Real Options"],
+        "acfTopics": ["Capital Budgeting", "Valuation"],
+        "difficulty": 2,
+        "prerequisites": ["present-value"],
+        "transcriptUrl": "/transcripts/j7D3vcaS9-o.pdf",
+        "captionsUrl": "/captions/j7D3vcaS9-o.vtt",
+        "thumbnailUrl": "https://img.youtube.com/vi/j7D3vcaS9-o/default.jpg"
+      }
+    ]
+  },
+  "playlists": {
+    "acf-exam-prep": {
+      "title": "ACF Exam Preparation Sequence",
+      "description": "Recommended viewing order for ACF placement exam preparation",
+      "duration": "8:45:00",
+      "lectures": [
+        "intro-overview",
+        "present-value", 
+        "risk-return",
+        "portfolio-theory",
+        "fixed-income-part1",
+        "capital-budgeting"
+      ]
+    },
+    "time-value-money": {
+      "title": "Time Value of Money Deep Dive",
+      "description": "Complete coverage of TVM concepts",
+      "duration": "2:37:00",
+      "lectures": [
+        "intro-overview",
+        "present-value"
+      ]
+    },
+    "portfolio-management": {
+      "title": "Portfolio Management Series",
+      "description": "From risk basics to advanced portfolio theory",
+      "duration": "4:43:00",
+      "lectures": [
+        "risk-return",
+        "portfolio-theory",
+        "capm-apt"
+      ]
+    },
+    "derivatives-fundamentals": {
+      "title": "Derivatives Fundamentals",
+      "description": "Introduction to forwards, futures, and options",
+      "duration": "4:05:00",
+      "lectures": [
+        "forwards-futures",
+        "options-part1"
+      ]
+    }
+  },
+  "supplementaryVideos": {
+    "khan-academy": [
+      {
+        "title": "Present Value and Future Value",
+        "youtube": "0uCrpTl-Jjk",
+        "duration": "12:15",
+        "topics": ["PV", "FV", "Basic TVM"],
+        "description": "Quick introduction to time value concepts"
+      },
+      {
+        "title": "Portfolio Diversification",
+        "youtube": "9P_vPJQWBI8", 
+        "duration": "8:30",
+        "topics": ["Diversification", "Risk Reduction"],
+        "description": "Visual explanation of diversification benefits"
+      }
+    ],
+    "professor-leonard": [
+      {
+        "title": "Time Value of Money - Complete Guide",
+        "youtube": "nRpn8nPz_Fk",
+        "duration": "45:20",
+        "topics": ["TVM", "Annuities", "Excel Functions"],
+        "description": "Comprehensive TVM tutorial with Excel examples"
+      }
+    ]
+  }
+}
