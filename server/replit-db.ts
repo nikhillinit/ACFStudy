@@ -199,6 +199,11 @@ export class ReplitDatabaseManager {
         }
     }
 
+    // Expose database instance for learning path engine
+    getDb() {
+        return this.db;
+    }
+
     async getStats() {
         const allData = await this.db.list();
         const stats = {

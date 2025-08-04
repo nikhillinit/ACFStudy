@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { AITutor } from "@/components/ai-tutor";
+import { LearningPathDashboard } from "@/components/learning-path";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -214,8 +215,9 @@ export default function Home() {
 
         {/* Learning Platform Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
             <TabsTrigger value="practice">Practice</TabsTrigger>
             <TabsTrigger value="diagnostic">Diagnostic</TabsTrigger>
             <TabsTrigger value="drills">Morning Drills</TabsTrigger>
@@ -277,6 +279,11 @@ export default function Home() {
                 );
               })}
             </div>
+          </TabsContent>
+
+          {/* Learning Path Tab */}
+          <TabsContent value="learning-path" className="space-y-6">
+            <LearningPathDashboard />
           </TabsContent>
 
           {/* Practice Tab */}

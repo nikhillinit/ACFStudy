@@ -6,6 +6,7 @@ import compression from "compression";
 import { replitAuthManager, requireAuth, optionalAuth, authLimiter, apiLimiter, generalLimiter, securityHeaders, sanitizeInput } from "./replit-auth";
 import { replitDbManager } from "./replit-db";
 import { aiServices } from "./ai-services";
+import { learningPathEngine } from "./learning-path-engine";
 
 // Helper function to calculate study streak
 function calculateStudyStreak(events: any[]): number {
@@ -298,6 +299,105 @@ export async function registerReplitRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: 'Failed to load dashboard'
+      });
+    }
+  });
+
+  // ========================================
+  // PERSONALIZED LEARNING PATH ROUTES
+  // ========================================
+
+  app.post('/api/learning-path/generate', requireAuth(replitAuthManager), async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const preferences = req.body.preferences || {};
+      
+      const learningPath = await learningPathEngine.generatePersonalizedPath(userId, preferences);
+      
+      // Track learning path generation
+      await replitDbManager.trackEvent(userId, 'learning_path_generated', {
+        pathId: learningPath.id,
+        totalSteps: learningPath.steps.length,
+        estimatedTime: learningPath.estimatedTotalTime
+      });
+      
+      res.json({
+        success: true,
+        learningPath
+      });
+    } catch (error) {
+      console.error('Learning path generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate learning path'
+      });
+    }
+  });
+
+  app.get('/api/learning-path/current', requireAuth(replitAuthManager), async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const learningPath = await learningPathEngine.getLearningPath(userId);
+      
+      if (!learningPath) {
+        return res.status(404).json({
+          success: false,
+          error: 'No active learning path found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        learningPath
+      });
+    } catch (error) {
+      console.error('Get learning path error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve learning path'
+      });
+    }
+  });
+
+  app.post('/api/learning-path/step/:stepId/complete', requireAuth(replitAuthManager), async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { stepId } = req.params;
+      const { completed = true } = req.body;
+      
+      await learningPathEngine.updatePathProgress(userId, stepId, completed);
+      
+      res.json({
+        success: true,
+        message: 'Step progress updated'
+      });
+    } catch (error) {
+      console.error('Step completion error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update step progress'
+      });
+    }
+  });
+
+  app.post('/api/learning-path/preferences', requireAuth(replitAuthManager), async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const preferences = req.body;
+      
+      // Regenerate path with new preferences
+      const learningPath = await learningPathEngine.generatePersonalizedPath(userId, preferences);
+      
+      res.json({
+        success: true,
+        learningPath,
+        message: 'Learning path updated with new preferences'
+      });
+    } catch (error) {
+      console.error('Update preferences error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update learning path preferences'
       });
     }
   });
