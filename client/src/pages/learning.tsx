@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EnhancedLearningModule } from '@/components/enhanced-learning-module';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/queryClient';
+import { acfMasterContent } from '@/data/acf-master-content';
 import { 
   Play, 
   BookOpen, 
@@ -23,7 +25,10 @@ import {
   Download,
   ChevronRight,
   Users,
-  TrendingUp
+  TrendingUp,
+  BarChart3,
+  DollarSign,
+  Award
 } from 'lucide-react';
 
 interface VideoLibrary {
@@ -134,6 +139,17 @@ export default function Learning() {
       });
     }, 5000);
   };
+
+  const handleModuleSelect = (moduleId: string) => {
+    setSelectedModule(moduleId);
+  };
+
+  const handleStartPractice = (moduleId: string) => {
+    // Navigate to practice page with specific module
+    window.location.href = `/practice?module=${moduleId}`;
+  };
+
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
 
   const getDifficultyColor = (difficulty: number) => {
     switch (difficulty) {
