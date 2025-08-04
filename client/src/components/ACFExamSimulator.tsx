@@ -7,6 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ExamPerformanceTracker } from '@/components/ExamPerformanceTracker';
 
 interface ACFExamSimulatorProps {
   onComplete?: () => void;
@@ -16,6 +18,7 @@ interface ExamQuestion {
   id: number;
   type: "calculation" | "multiple_choice";
   competency: string;
+  difficulty: number;
   question: string;
   answer?: number;
   tolerance?: number;
@@ -39,6 +42,7 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
       id: 1,
       type: "calculation",
       competency: "Present Value",
+      difficulty: 2,
       question: "What is the present value of receiving $5,000 in 3 years at a 8% discount rate?",
       answer: 3969,
       tolerance: 50,
@@ -48,6 +52,7 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
       id: 2,
       type: "calculation", 
       competency: "Amortization",
+      difficulty: 3,
       question: "What is the monthly payment on a $200,000 loan for 30 years at 6% APR?",
       answer: 1199,
       tolerance: 10,
@@ -57,6 +62,7 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
       id: 3,
       type: "calculation",
       competency: "Present Value",
+      difficulty: 2,
       question: "Present value of $1,000 annually for 5 years at 7% discount rate?",
       answer: 4100,
       tolerance: 50,
@@ -66,6 +72,7 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
       id: 4,
       type: "calculation",
       competency: "Future Value",
+      difficulty: 2,
       question: "Future value of $10,000 invested for 8 years at 9% annual rate?",
       answer: 19926,
       tolerance: 100,
@@ -74,7 +81,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 5,
       type: "calculation",
-      competency: "Portfolio Return",
+      competency: "Portfolio Theory",
+      difficulty: 2,
       question: "Portfolio: 40% Asset A (12% return), 60% Asset B (8% return). Expected return (in %)?",
       answer: 9.6,
       tolerance: 0.2,
@@ -83,7 +91,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 6,
       type: "calculation",
-      competency: "Bond YTM",
+      competency: "Bond Valuation",
+      difficulty: 3,
       question: "Bond: $980 price, 6% coupon, $1000 face, 3 years. YTM (approximate %)?",
       answer: 6.8,
       tolerance: 0.3,
@@ -93,7 +102,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 7,
       type: "multiple_choice",
-      competency: "Classification",
+      competency: "Financial Statements",
+      difficulty: 1,
       question: "Accounts Receivable is classified as:",
       options: ["Current Asset", "Long-term Asset", "Current Liability", "Long-term Liability"],
       correct: 0,
@@ -102,7 +112,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 8,
       type: "multiple_choice",
-      competency: "Classification",
+      competency: "Financial Statements",
+      difficulty: 2,
       question: "Patents are classified as:",
       options: ["Current Asset", "Long-term Asset", "Current Liability", "Equity"],
       correct: 1,
@@ -111,7 +122,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 9,
       type: "multiple_choice",
-      competency: "Classification",
+      competency: "Financial Statements",
+      difficulty: 1,
       question: "Retained Earnings is classified as:",
       options: ["Current Asset", "Long-term Liability", "Equity", "Current Liability"],
       correct: 2,
@@ -120,7 +132,8 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     {
       id: 10,
       type: "multiple_choice",
-      competency: "Classification",
+      competency: "Financial Statements",
+      difficulty: 2,
       question: "Mortgage Payable (15-year term) is classified as:",
       options: ["Current Asset", "Current Liability", "Long-term Liability", "Equity"],
       correct: 2,
@@ -279,78 +292,105 @@ export function ACFExamSimulator({ onComplete }: ACFExamSimulatorProps) {
     );
   }
 
-  // Exam in progress
+  // Exam in progress - Real-time tracking interface
   const currentQ = examQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / examQuestions.length) * 100;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span>ACF Placement Exam</span>
-          <div className="flex items-center space-x-4 text-sm">
-            <span>Question {currentQuestion + 1}/{examQuestions.length}</span>
-            <span>Time: {formatTime(timeLeft)}</span>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Progress value={progress} className="w-full" />
-        
-        <div className="space-y-4">
-          <Badge variant="outline">{currentQ.competency}</Badge>
-          <h3 className="text-lg font-medium">{currentQ.question}</h3>
-          
-          {currentQ.type === 'calculation' ? (
-            <div className="space-y-2">
-              <Label>Your Answer:</Label>
-              <Input
-                type="number"
-                step="any"
-                value={answers[currentQ.id] || ''}
-                onChange={(e) => handleAnswer(currentQ.id, e.target.value)}
-                placeholder="Enter your calculation result"
-                data-testid="calculation-input"
-              />
-            </div>
-          ) : (
-            <RadioGroup
-              value={answers[currentQ.id] || ''}
-              onValueChange={(value) => handleAnswer(currentQ.id, value)}
-            >
-              {currentQ.options?.map((option, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                  <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                    {option}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          )}
-        </div>
+    <div className="space-y-6">
+      <Tabs defaultValue="exam" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="exam">Exam Interface</TabsTrigger>
+          <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
+        </TabsList>
 
-        <div className="flex justify-between">
-          <Button 
-            onClick={prevQuestion} 
-            disabled={currentQuestion === 0}
-            variant="outline"
-            data-testid="prev-question"
-          >
-            Previous
-          </Button>
-          
-          {currentQuestion === examQuestions.length - 1 ? (
-            <Button onClick={completeExam} data-testid="finish-exam">
-              Finish Exam
-            </Button>
-          ) : (
-            <Button onClick={nextQuestion} data-testid="next-question">
-              Next
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        <TabsContent value="exam" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <span>ACF Placement Exam</span>
+                <div className="flex items-center space-x-4 text-sm">
+                  <span>Question {currentQuestion + 1}/{examQuestions.length}</span>
+                  <span>Time: {formatTime(timeLeft)}</span>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Progress value={progress} className="w-full" />
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline">{currentQ.competency}</Badge>
+                  <Badge variant={currentQ.difficulty === 1 ? "secondary" : currentQ.difficulty === 2 ? "default" : "destructive"}>
+                    Level {currentQ.difficulty}
+                  </Badge>
+                </div>
+                <h3 className="text-lg font-medium">{currentQ.question}</h3>
+                
+                {currentQ.type === 'calculation' ? (
+                  <div className="space-y-2">
+                    <Label>Your Answer:</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={answers[currentQ.id] || ''}
+                      onChange={(e) => handleAnswer(currentQ.id, e.target.value)}
+                      placeholder="Enter your calculation result"
+                      data-testid="calculation-input"
+                    />
+                  </div>
+                ) : (
+                  <RadioGroup
+                    value={answers[currentQ.id] || ''}
+                    onValueChange={(value) => handleAnswer(currentQ.id, value)}
+                  >
+                    {currentQ.options?.map((option, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+                        <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+              </div>
+
+              <div className="flex justify-between">
+                <Button 
+                  onClick={prevQuestion} 
+                  disabled={currentQuestion === 0}
+                  variant="outline"
+                  data-testid="prev-question"
+                >
+                  Previous
+                </Button>
+                
+                {currentQuestion === examQuestions.length - 1 ? (
+                  <Button onClick={completeExam} data-testid="finish-exam">
+                    Finish Exam
+                  </Button>
+                ) : (
+                  <Button onClick={nextQuestion} data-testid="next-question">
+                    Next
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <ExamPerformanceTracker
+            questions={examQuestions}
+            currentQuestionIndex={currentQuestion}
+            timeElapsed={7200 - timeLeft}
+            totalTime={7200}
+            answers={answers}
+            onQuestionChange={setCurrentQuestion}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

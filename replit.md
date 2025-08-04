@@ -67,6 +67,9 @@ This is a comprehensive Advanced Corporate Finance (ACF) learning platform desig
 - **Financial Statement Classification Game**: Timed classification challenge with 20 accounting items, 5-minute timer, and instant feedback
 - **ACF Exam Simulator**: Full placement exam simulation with 10 questions across all competency areas and 2-hour time limit
 - **Portfolio Calculator**: Interactive risk-return calculator with correlation analysis, preset portfolios, and practice problems
+- **Real-Time Exam Performance Tracker**: Live analytics during exam with competency tracking, momentum analysis, and predictive scoring
+- **Interactive Exam Simulation**: Real-time performance tracking with question-by-question analytics, live competency scoring, and predictive feedback
+- **Performance Analytics Dashboard**: Comprehensive real-time metrics including accuracy trends, pace monitoring, strength/weakness identification
 - **Modal-Based Interface**: Seamless overlay system for launching interactive tools from practice challenges tab
 - **Performance Tracking**: Integrated scoring, timing, and detailed solution explanations for all interactive components
 - **Mobile-Responsive Design**: Fully responsive interactive tools that work across all device sizes

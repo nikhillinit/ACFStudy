@@ -11,6 +11,7 @@ import { GamifiedPractice } from '@/components/gamified-practice';
 import { FinancialStatementGame } from '@/components/FinancialStatementGame';
 import { ACFExamSimulator } from '@/components/ACFExamSimulator';
 import { PortfolioCalculator } from '@/components/PortfolioCalculator';
+import { RealTimeExamTracker } from '@/components/RealTimeExamTracker';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
@@ -335,7 +336,7 @@ export default function PracticePage() {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                   <Card 
                     className="hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => setShowInteractive('portfolio')}
@@ -375,6 +376,20 @@ export default function PracticePage() {
                         Full placement exam simulation with timing
                       </p>
                       <Button className="w-full" data-testid="launch-exam-sim">Take Exam</Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setShowInteractive('realtime')}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <BarChart3 className="h-12 w-12 text-indigo-600 mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">Real-Time Tracker</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Live performance analytics during exam
+                      </p>
+                      <Button className="w-full" data-testid="launch-realtime-tracker">Track Performance</Button>
                     </CardContent>
                   </Card>
                 </div>
@@ -492,6 +507,7 @@ export default function PracticePage() {
                   {showInteractive === 'portfolio' && 'Portfolio Calculator'}
                   {showInteractive === 'classification' && 'Financial Statement Classification Game'}
                   {showInteractive === 'exam' && 'ACF Exam Simulator'}
+                  {showInteractive === 'realtime' && 'Real-Time Exam Performance Tracker'}
                 </h2>
                 <Button 
                   variant="outline" 
@@ -510,6 +526,9 @@ export default function PracticePage() {
               )}
               {showInteractive === 'exam' && (
                 <ACFExamSimulator onComplete={() => setShowInteractive(null)} />
+              )}
+              {showInteractive === 'realtime' && (
+                <RealTimeExamTracker onComplete={() => setShowInteractive(null)} />
               )}
             </div>
           </div>
