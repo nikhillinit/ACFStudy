@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import helmet from "helmet";
 import compression from "compression";
@@ -33,10 +34,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(securityHeaders);
   app.use(compression());
   
-  // Rate limiting
-  app.use('/api/auth', authLimiter);
-  app.use('/api', apiLimiter);
-  app.use(generalLimiter);
+  // Rate limiting (disabled in development)
+  if (process.env.NODE_ENV !== 'development') {
+    app.use('/api/auth', authLimiter);
+    app.use('/api', apiLimiter);
+    app.use(generalLimiter);
+  }
   
   // Input sanitization
   app.use(sanitizeInput);
@@ -172,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           topicsWithProgress++;
         }
         
-        topicStats[topic] = {
+        topicStats[topic as string] = {
           completed,
           total: count,
           percentage: Math.round((completed / count) * 100),

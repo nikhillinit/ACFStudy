@@ -65,7 +65,7 @@ export const authLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    validate: false,
+    skip: (req) => process.env.NODE_ENV === 'development',
 });
 
 export const generalLimiter = rateLimit({
@@ -74,8 +74,8 @@ export const generalLimiter = rateLimit({
     message: {
         error: 'Too many requests, please try again later.'
     },
-    // Disable trust proxy validation for development
-    validate: false,
+    // Skip trust proxy validation for development
+    skip: (req) => process.env.NODE_ENV === 'development',
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -88,7 +88,7 @@ export const apiLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    validate: false,
+    skip: (req) => process.env.NODE_ENV === 'development',
 });
 
 // Security headers middleware
