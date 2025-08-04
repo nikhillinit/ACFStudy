@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PracticeSession } from '@/components/practice-session';
 import { EnhancedQuiz } from '@/components/enhanced-quiz';
 import { NoteTaking } from '@/components/note-taking';
+import { GamifiedPractice } from '@/components/gamified-practice';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
@@ -226,8 +227,9 @@ export default function PracticePage() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 sm:mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-6 sm:mb-8">
             <TabsTrigger value="topics" className="text-xs sm:text-sm">Practice Topics</TabsTrigger>
+            <TabsTrigger value="challenges" className="text-xs sm:text-sm">Challenges</TabsTrigger>
             <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">Diagnostic Test</TabsTrigger>
             <TabsTrigger value="adaptive" className="text-xs sm:text-sm">Adaptive Mode</TabsTrigger>
             <TabsTrigger value="notes" className="text-xs sm:text-sm">Study Notes</TabsTrigger>
@@ -309,6 +311,11 @@ export default function PracticePage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Gamified Challenges Tab */}
+          <TabsContent value="challenges" className="space-y-4 sm:space-y-6">
+            <GamifiedPractice />
           </TabsContent>
 
           {/* Diagnostic Test Tab */}

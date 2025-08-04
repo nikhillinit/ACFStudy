@@ -24,7 +24,7 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table.
+// Enhanced User storage table with gamification features.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -32,6 +32,18 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Gamification fields
+  level: integer("level").default(1),
+  xp: integer("xp").default(0),
+  totalXP: integer("total_xp").default(0),
+  coins: integer("coins").default(100),
+  streak: integer("streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  dailyGoalsCompleted: integer("daily_goals_completed").default(0),
+  weeklyRank: integer("weekly_rank").default(0),
+  globalRank: integer("global_rank").default(0),
+  learningStyle: varchar("learning_style").default("visual"), // visual, auditory, kinesthetic, reading
+  preferredStudyTime: varchar("preferred_study_time").default("morning"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -63,15 +75,23 @@ export const modules = pgTable("modules", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Problems table for storing practice problems
+// Enhanced Problems table for storing practice problems with gamification
 export const problems = pgTable("problems", {
   id: varchar("id").primaryKey(),
   topic: varchar("topic").notNull(),
-  difficulty: integer("difficulty").default(0), // 0-2 scale
+  difficulty: integer("difficulty").default(0), // 0-2 scale (easy, medium, hard)
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   solution: text("solution").notNull(),
+  explanation: text("explanation"),
   concepts: text("concepts").array(),
+  hints: text("hints").array(),
+  estimatedTime: integer("estimated_time").default(90), // in seconds
+  xpReward: integer("xp_reward").default(10),
+  coinReward: integer("coin_reward").default(5),
+  prerequisites: text("prerequisites").array(),
+  relatedQuestions: text("related_questions").array(),
+  commonMistakes: text("common_mistakes").array(),
   isActive: varchar("is_active").default("true"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -143,6 +163,101 @@ export const insertPracticeSessionSchema = createInsertSchema(practiceSessions).
   completed: true,
 });
 
+// Achievements table for gamification
+export const achievements = pgTable("achievements", {
+  id: varchar("id").primaryKey(),
+  name: varchar("name").notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon").default("trophy"),
+  rarity: varchar("rarity").default("common"), // common, rare, epic, legendary
+  xpReward: integer("xp_reward").default(50),
+  coinReward: integer("coin_reward").default(25),
+  criteria: jsonb("criteria").notNull(), // Achievement unlock conditions
+  isActive: varchar("is_active").default("true"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User achievements tracking
+export const userAchievements = pgTable("user_achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  achievementId: varchar("achievement_id").notNull().references(() => achievements.id),
+  progress: integer("progress").default(0),
+  maxProgress: integer("max_progress").default(1),
+  unlocked: varchar("unlocked").default("false"),
+  unlockedAt: timestamp("unlocked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Learning challenges table
+export const learningChallenges = pgTable("learning_challenges", {
+  id: varchar("id").primaryKey(),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category").notNull(),
+  difficulty: varchar("difficulty").default("beginner"), // beginner, intermediate, advanced
+  timeLimit: integer("time_limit").default(300), // in seconds
+  xpReward: integer("xp_reward").default(20),
+  coinReward: integer("coin_reward").default(10),
+  problemIds: text("problem_ids").array(),
+  isActive: varchar("is_active").default("true"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User challenge attempts
+export const challengeAttempts = pgTable("challenge_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  challengeId: varchar("challenge_id").notNull().references(() => learningChallenges.id),
+  score: decimal("score", { precision: 5, scale: 2 }),
+  timeSpent: integer("time_spent").default(0), // in seconds
+  completed: varchar("completed").default("false"),
+  completedAt: timestamp("completed_at"),
+  results: jsonb("results"), // Detailed challenge results
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Power-ups table for gamification
+export const powerUps = pgTable("power_ups", {
+  id: varchar("id").primaryKey(),
+  name: varchar("name").notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon").default("zap"),
+  effect: varchar("effect").notNull(), // time_boost, hint_reveal, skip_question, etc.
+  duration: integer("duration").default(300), // in seconds
+  cost: integer("cost").default(50), // coin cost
+  isActive: varchar("is_active").default("true"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User power-ups inventory
+export const userPowerUps = pgTable("user_power_ups", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  powerUpId: varchar("power_up_id").notNull().references(() => powerUps.id),
+  quantity: integer("quantity").default(0),
+  active: varchar("active").default("false"),
+  activatedAt: timestamp("activated_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements);
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertLearningChallengeSchema = createInsertSchema(learningChallenges);
+export const insertChallengeAttemptSchema = createInsertSchema(challengeAttempts).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertPowerUpSchema = createInsertSchema(powerUps);
+export const insertUserPowerUpSchema = createInsertSchema(userPowerUps).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type InsertProgress = z.infer<typeof insertProgressSchema>;
@@ -156,3 +271,15 @@ export type DiagnosticResult = typeof diagnosticResults.$inferSelect;
 export type InsertDiagnosticResult = z.infer<typeof insertDiagnosticResultSchema>;
 export type PracticeSession = typeof practiceSessions.$inferSelect;
 export type InsertPracticeSession = z.infer<typeof insertPracticeSessionSchema>;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type LearningChallenge = typeof learningChallenges.$inferSelect;
+export type InsertLearningChallenge = z.infer<typeof insertLearningChallengeSchema>;
+export type ChallengeAttempt = typeof challengeAttempts.$inferSelect;
+export type InsertChallengeAttempt = z.infer<typeof insertChallengeAttemptSchema>;
+export type PowerUp = typeof powerUps.$inferSelect;
+export type InsertPowerUp = z.infer<typeof insertPowerUpSchema>;
+export type UserPowerUp = typeof userPowerUps.$inferSelect;
+export type InsertUserPowerUp = z.infer<typeof insertUserPowerUpSchema>;
