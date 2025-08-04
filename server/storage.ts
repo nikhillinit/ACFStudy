@@ -6,6 +6,7 @@ import {
   problems,
   diagnosticResults,
   practiceSessions,
+  learningStyles,
   type User,
   type UpsertUser,
   type InsertProgress,
@@ -18,6 +19,8 @@ import {
   type InsertDiagnosticResult,
   type PracticeSession,
   type InsertPracticeSession,
+  type LearningStyle,
+  type UpsertLearningStyle,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -51,6 +54,10 @@ export interface IStorage {
   // Practice session operations
   createPracticeSession(session: InsertPracticeSession): Promise<PracticeSession>;
   getUserPracticeSessions(userId: string): Promise<PracticeSession[]>;
+  
+  // Learning style operations
+  saveLearningStyle(learningStyle: UpsertLearningStyle): Promise<LearningStyle>;
+  getLearningStyle(userId: string): Promise<LearningStyle | undefined>;
   
   // Session operations
   createUserSession(userId: string): Promise<UserSession>;
@@ -226,6 +233,42 @@ export class DatabaseStorage implements IStorage {
       .from(userSessions)
       .where(eq(userSessions.userId, userId))
       .orderBy(desc(userSessions.sessionStart));
+  }
+
+  // Learning style operations
+  async saveLearningStyle(learningStyleData: UpsertLearningStyle): Promise<LearningStyle> {
+    const [existingStyle] = await db
+      .select()
+      .from(learningStyles)
+      .where(eq(learningStyles.userId, learningStyleData.userId!));
+
+    if (existingStyle) {
+      // Update existing learning style
+      const [updatedStyle] = await db
+        .update(learningStyles)
+        .set({
+          ...learningStyleData,
+          updatedAt: new Date(),
+        })
+        .where(eq(learningStyles.userId, learningStyleData.userId!))
+        .returning();
+      return updatedStyle;
+    } else {
+      // Create new learning style
+      const [newStyle] = await db
+        .insert(learningStyles)
+        .values(learningStyleData)
+        .returning();
+      return newStyle;
+    }
+  }
+
+  async getLearningStyle(userId: string): Promise<LearningStyle | undefined> {
+    const [style] = await db
+      .select()
+      .from(learningStyles)
+      .where(eq(learningStyles.userId, userId));
+    return style;
   }
 }
 

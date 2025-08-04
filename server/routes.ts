@@ -308,6 +308,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Learning style routes
+  app.post('/api/learning-style/save', async (req, res) => {
+    try {
+      const { userId, ...learningStyleData } = req.body;
+      
+      // Use anonymous ID for non-authenticated users
+      const finalUserId = userId || `anonymous_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const learningStyle = await storage.saveLearningStyle({
+        userId: finalUserId,
+        ...learningStyleData
+      });
+      
+      res.json(learningStyle);
+    } catch (error) {
+      console.error('Error saving learning style:', error);
+      res.status(500).json({ message: 'Failed to save learning style' });
+    }
+  });
+
+  app.get('/api/learning-style/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const learningStyle = await storage.getLearningStyle(userId);
+      
+      if (!learningStyle) {
+        return res.status(404).json({ message: 'Learning style not found' });
+      }
+      
+      res.json(learningStyle);
+    } catch (error) {
+      console.error('Error fetching learning style:', error);
+      res.status(500).json({ message: 'Failed to fetch learning style' });
+    }
+  });
+
   // Learning modules routes
   app.use('/learning-modules', express.static('learning-modules'));
   

@@ -260,6 +260,29 @@ export const insertUserPowerUpSchema = createInsertSchema(userPowerUps).omit({
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Learning Style profiles for personalized study recommendations
+export const learningStyles = pgTable("learning_styles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(), // Can be anonymous user ID for non-authenticated users
+  visual: integer("visual").default(0),
+  auditory: integer("auditory").default(0),
+  kinesthetic: integer("kinesthetic").default(0),
+  reading: integer("reading").default(0),
+  social: integer("social").default(0),
+  solitary: integer("solitary").default(0),
+  logical: integer("logical").default(0),
+  sequential: integer("sequential").default(0),
+  primary: varchar("primary").notNull(),
+  secondary: varchar("secondary").notNull(),
+  description: varchar("description", { length: 1000 }),
+  studyTips: jsonb("study_tips").$type<string[]>().default([]),
+  completedAt: timestamp("completed_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type LearningStyle = typeof learningStyles.$inferSelect;
+export type UpsertLearningStyle = typeof learningStyles.$inferInsert;
 export type InsertProgress = z.infer<typeof insertProgressSchema>;
 export type Progress = typeof progress.$inferSelect;
 export type InsertModule = z.infer<typeof insertModuleSchema>;

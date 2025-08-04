@@ -34,12 +34,17 @@ import { EnhancedModulesView } from "@/components/enhanced-modules";
 import { EnhancedProgressTracker } from "@/components/enhanced-progress-tracker";
 import { AIStudyCompanion } from "@/components/ai-study-companion";
 import { useStudyCompanion } from "@/hooks/useStudyCompanion";
+import { useLearningStyle } from "@/hooks/useLearningStyle";
+import LearningStyleModal from "@/components/LearningStyleModal";
+import LearningStyleBadge from "@/components/LearningStyleBadge";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const [showAITutor, setShowAITutor] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState("");
+  const [showLearningStyleModal, setShowLearningStyleModal] = useState(false);
+  const { learningStyle, hasCompletedQuiz, isLoading: learningStyleLoading } = useLearningStyle();
 
   // Initialize study companion
   const { companionData } = useStudyCompanion({
@@ -123,6 +128,17 @@ export default function Home() {
     }
   }, [typedUser, isLoading, toast]);
 
+  // Show learning style quiz for new users
+  useEffect(() => {
+    if (!learningStyleLoading && typedUser && !hasCompletedQuiz) {
+      // Small delay to let the page load first
+      const timer = setTimeout(() => {
+        setShowLearningStyleModal(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [learningStyleLoading, typedUser, hasCompletedQuiz]);
+
   const handleLogout = () => {
     window.location.href = "/api/logout";
   };
@@ -159,6 +175,20 @@ export default function Home() {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {hasCompletedQuiz && learningStyle && (
+                <div className="hidden lg:flex items-center space-x-2">
+                  <LearningStyleBadge style={learningStyle.primary} size="sm" />
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowLearningStyleModal(true)}
+                    className="text-xs px-2 py-1 h-6"
+                    data-testid="button-learning-style"
+                  >
+                    View
+                  </Button>
+                </div>
+              )}
               <div className="hidden md:flex items-center space-x-2">
                 {typedUser.profileImageUrl ? (
                   <img 
@@ -531,6 +561,13 @@ export default function Home() {
           }}
         />
       )}
+
+      {/* Learning Style Modal */}
+      <LearningStyleModal
+        isOpen={showLearningStyleModal}
+        onClose={() => setShowLearningStyleModal(false)}
+        trigger={hasCompletedQuiz ? "settings" : "onboarding"}
+      />
     </div>
   );
 }
