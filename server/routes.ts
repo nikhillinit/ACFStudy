@@ -6,9 +6,6 @@ import compression from "compression";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
-  generalLimiter, 
-  apiLimiter, 
-  authLimiter,
   securityHeaders, 
   sanitizeInput,
   enhancedAuth
@@ -34,12 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(securityHeaders);
   app.use(compression());
   
-  // Rate limiting (disabled in development)
-  if (process.env.NODE_ENV !== 'development') {
-    app.use('/api/auth', authLimiter);
-    app.use('/api', apiLimiter);
-    app.use(generalLimiter);
-  }
+  // Rate limiting disabled for development
   
   // Input sanitization
   app.use(sanitizeInput);
