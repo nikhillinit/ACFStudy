@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerReplitRoutes } from "./replit-integration";
 import { setupVite, serveStatic, log } from "./vite";
+import { logger, logRequest, logError } from "./logger";
 
 const app = express();
 app.use(express.json());
@@ -20,16 +21,10 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      logRequest(req.method, path, res.statusCode, duration);
+      if (capturedJsonResponse && res.statusCode >= 400) {
+        logger.debug({ response: capturedJsonResponse }, 'API Response');
       }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
     }
   });
 
@@ -43,8 +38,8 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    logError(err, 'Express error handler');
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after
@@ -66,6 +61,10 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    logger.info({
+      port,
+      env: process.env.NODE_ENV || 'development',
+      nodeVersion: process.version
+    }, 'Server started successfully');
   });
 })();
