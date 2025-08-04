@@ -1,0 +1,57 @@
+{
+  "name": "acf-mastery-platform-enhanced",
+  "version": "2.0.0",
+  "description": "Advanced Corporate Finance Learning Platform - Production Ready",
+  "main": "server-enhanced.js",
+  "scripts": {
+    "start": "node server-enhanced.js",
+    "dev": "nodemon server-enhanced.js",
+    "test": "jest",
+    "migrate": "node scripts/migrate-to-phase2.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js",
+    "health": "curl -f http://localhost:3000/api/health || exit 1",
+    "install-replit": "npm install @replit/database",
+    "security-audit": "npm audit --audit-level moderate"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "optionalDependencies": {
+    "@replit/database": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "finance",
+    "education",
+    "learning-platform",
+    "acf",
+    "kellogg",
+    "adaptive-learning"
+  ],
+  "author": "ACF Mastery Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nikhillinit/ACF-Interactive-Learning.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nikhillinit/ACF-Interactive-Learning/issues"
+  },
+  "homepage": "https://github.com/nikhillinit/ACF-Interactive-Learning#readme"
+}

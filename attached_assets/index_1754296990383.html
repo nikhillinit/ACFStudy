@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACF Mastery Platform</title>
+    <link rel="stylesheet" href="https://unpkg.com/katex@0.16.0/dist/katex.min.css">
+    <script src="https://unpkg.com/katex@0.16.0/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 ACF Mastery Platform</h1>
+            <p>Master Advanced Corporate Finance • Kellogg Exam Prep</p>
+        </div>
+
+        <div class="main-card">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="nav-tab" onclick="showTab('diagnostic')">Diagnostic</button>
+                <button class="nav-tab" onclick="showTab('practice')">Practice</button>
+                <button class="nav-tab" onclick="showTab('drills')">Morning Drills</button>
+                <button class="nav-tab" onclick="showTab('formulas')">Formulas</button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-pane active">
+                <div class="tab-content">
+                    <div class="stats-summary">
+                        <h2>Your ACF Mastery Journey</h2>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-number" id="overallScore">0%</div>
+                                <div class="stat-label">Overall Mastery</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="problemsSolved">0</div>
+                                <div class="stat-label">Problems Solved</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="studyStreak">0</div>
+                                <div class="stat-label">Day Streak</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-grid">
+                        <div class="progress-card">
+                            <h3>Time Value of Money</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="tvmProgress" style="width: 0%"></div>
+                            </div>
+                            <p><span id="tvmScore">0</span>/25 completed</p>
+                        </div>
+                        <div class="progress-card">
+                            <h3>Portfolio Theory</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="portfolioProgress" style="width: 0%"></div>
+                            </div>
+                            <p><span id="portfolioScore">0</span>/25 completed</p>
+                        </div>
+                        <div class="progress-card">
+                            <h3>Bond Valuation</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="bondProgress" style="width: 0%"></div>
+                            </div>
+                            <p><span id="bondScore">0</span>/25 completed</p>
+                        </div>
+                        <div class="progress-card">
+                            <h3>Financial Statements</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="financialProgress" style="width: 0%"></div>
+                            </div>
+                            <p><span id="financialScore">0</span>/15 completed</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-selector">
+                        <button class="topic-btn" onclick="startPractice('Time Value of Money')">
+                            📈 Time Value of Money<br><small>25 Problems</small>
+                        </button>
+                        <button class="topic-btn" onclick="startPractice('Portfolio Theory')">
+                            📊 Portfolio Theory<br><small>25 Problems</small>
+                        </button>
+                        <button class="topic-btn" onclick="startPractice('Bond Valuation')">
+                            🏦 Bond Valuation<br><small>25 Problems</small>
+                        </button>
+                        <button class="topic-btn" onclick="startPractice('Financial Statements')">
+                            📋 Financial Statements<br><small>15 Problems</small>
+                        </button>
+                        <button class="topic-btn" onclick="startPractice('Derivatives')">
+                            📈 Derivatives (Bonus)<br><small>25 Problems</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostic Tab -->
+            <div id="diagnostic" class="tab-pane">
+                <div class="tab-content">
+                    <div id="diagnosticIntro">
+                        <h2>📊 Diagnostic Assessment</h2>
+                        <p style="margin: 20px 0; font-size: 1.1rem; line-height: 1.6;">
+                            Take this 25-question diagnostic test to identify your strengths and areas for improvement. 
+                            This will help create a personalized study plan tailored to your needs.
+                        </p>
+                        <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h4>Test Format:</h4>
+                            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                                <li>25 questions (5 from each topic)</li>
+                                <li>30 minutes total (recommended)</li>
+                                <li>Results automatically saved</li>
+                                <li>Immediate feedback and study recommendations</li>
+                            </ul>
+                        </div>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="btn btn-primary" onclick="startDiagnostic()" style="font-size: 1.2rem; padding: 15px 30px;">
+                                Start Diagnostic Test
+                            </button>
+                        </div>
+                    </div>
+                    <div id="diagnosticTest" style="display: none;">
+                        <!-- Diagnostic test content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Tab -->
+            <div id="practice" class="tab-pane">
+                <div class="tab-content">
+                    <div id="practiceHome">
+                        <h2>🎯 Practice Mode</h2>
+                        <p style="margin: 20px 0; font-size: 1.1rem;">
+                            Choose a topic to practice. Problems are selected based on your performance and areas that need improvement.
+                        </p>
+                        <div class="topic-selector">
+                            <button class="topic-btn" onclick="startPractice('Time Value of Money')">
+                                📈 Time Value of Money
+                            </button>
+                            <button class="topic-btn" onclick="startPractice('Portfolio Theory')">
+                                📊 Portfolio Theory
+                            </button>
+                            <button class="topic-btn" onclick="startPractice('Bond Valuation')">
+                                🏦 Bond Valuation
+                            </button>
+                            <button class="topic-btn" onclick="startPractice('Financial Statements')">
+                                📋 Financial Statements
+                            </button>
+                            <button class="topic-btn" onclick="startPractice('Derivatives')">
+                                📈 Derivatives
+                            </button>
+                        </div>
+                    </div>
+                    <div id="practiceSession" style="display: none;">
+                        <!-- Practice session content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Morning Drills Tab -->
+            <div id="drills" class="tab-pane">
+                <div class="tab-content">
+                    <h2>🌅 Morning Drills</h2>
+                    <div id="drillsContent">
+                        <div style="text-align: center; padding: 40px;">
+                            <p style="font-size: 1.2rem; color: #6c757d;">
+                                Complete your first practice session to unlock daily drills!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulas Tab -->
+            <div id="formulas" class="tab-pane">
+                <div class="tab-content">
+                    <h2>📖 Formula Reference</h2>
+                    <div id="formulaContent">
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h3>Time Value of Money</h3>
+                            <div style="margin: 15px 0;">
+                                <strong>Present Value:</strong> PV = FV / (1+r)^n
+                            </div>
+                            <div style="margin: 15px 0;">
+                                <strong>Future Value:</strong> FV = PV × (1+r)^n
+                            </div>
+                            <div style="margin: 15px 0;">
+                                <strong>Annuity PV:</strong> PV = PMT × [1 - (1+r)^-n] / r
+                            </div>
+                        </div>
+                        
+                        <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h3>Portfolio Theory</h3>
+                            <div style="margin: 15px 0;">
+                                <strong>CAPM:</strong> E(R) = Rf + β(Rm - Rf)
+                            </div>
+                            <div style="margin: 15px 0;">
+                                <strong>Portfolio Variance:</strong> σp² = w1²σ1² + w2²σ2² + 2w1w2ρ12σ1σ2
+                            </div>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h3>Bond Valuation</h3>
+                            <div style="margin: 15px 0;">
+                                <strong>Bond Price:</strong> P = Σ[C/(1+y)^t] + F/(1+y)^n
+                            </div>
+                            <div style="margin: 15px 0;">
+                                <strong>Current Yield:</strong> Annual Coupon / Current Price
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
