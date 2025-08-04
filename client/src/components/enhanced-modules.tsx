@@ -113,52 +113,52 @@ export function EnhancedModulesView() {
     .reduce((sum, m, _, arr) => sum + (m.userProgress?.accuracy || 0) / arr.length, 0);
 
   return (
-    <div className="space-y-6" data-testid="enhanced-modules-view">
+    <div className="space-y-3 sm:space-y-6" data-testid="enhanced-modules-view">
       {/* Header Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="h-5 w-5 text-blue-600" />
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               <div>
-                <p className="text-sm font-medium">Total Problems</p>
-                <p className="text-2xl font-bold">{totalProblems}+</p>
+                <p className="text-xs sm:text-sm font-medium">Total Problems</p>
+                <p className="text-lg sm:text-2xl font-bold">{totalProblems}+</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               <div>
-                <p className="text-sm font-medium">Completed</p>
-                <p className="text-2xl font-bold">{totalCompleted}</p>
+                <p className="text-xs sm:text-sm font-medium">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold">{totalCompleted}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Target className="h-5 w-5 text-purple-600" />
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
               <div>
-                <p className="text-sm font-medium">Avg Accuracy</p>
-                <p className="text-2xl font-bold">{avgAccuracy > 0 ? Math.round(avgAccuracy) : 0}%</p>
+                <p className="text-xs sm:text-sm font-medium">Avg Accuracy</p>
+                <p className="text-lg sm:text-2xl font-bold">{avgAccuracy > 0 ? Math.round(avgAccuracy) : 0}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <GraduationCap className="h-5 w-5 text-orange-600" />
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
               <div>
-                <p className="text-sm font-medium">Modules</p>
-                <p className="text-2xl font-bold">{modules.length}</p>
+                <p className="text-xs sm:text-sm font-medium">Modules</p>
+                <p className="text-lg sm:text-2xl font-bold">{modules.length}</p>
               </div>
             </div>
           </CardContent>
@@ -167,9 +167,9 @@ export function EnhancedModulesView() {
 
       {/* Category Filter */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
           {categories.map(category => (
-            <TabsTrigger key={category} value={category} className="capitalize">
+            <TabsTrigger key={category} value={category} className="capitalize text-xs sm:text-sm px-2 py-1">
               {category === 'all' ? 'All' : category.replace(/([A-Z])/g, ' $1').trim()}
             </TabsTrigger>
           ))}
@@ -177,7 +177,7 @@ export function EnhancedModulesView() {
       </Tabs>
 
       {/* Enhanced Modules Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {filteredModules.map((module) => {
           const IconComponent = getCategoryIcon(module.category);
           const progress = module.userProgress;
@@ -187,96 +187,106 @@ export function EnhancedModulesView() {
           
           return (
             <Card key={module.id} className="hover:shadow-lg transition-shadow duration-200" data-testid={`module-card-${module.id}`}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <IconComponent className="h-6 w-6 text-primary" />
+              <CardHeader className="p-3 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-2 sm:space-y-0">
+                  <div className="flex items-start space-x-2 sm:space-x-3 flex-1">
+                    <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                      <IconComponent className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{module.title}</CardTitle>
-                      <CardDescription className="mt-1">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base sm:text-lg leading-tight">{module.title}</CardTitle>
+                      <CardDescription className="mt-1 text-xs sm:text-sm line-clamp-2">
                         {module.description}
                       </CardDescription>
                     </div>
                   </div>
-                  <Badge className={getDifficultyColor(module.difficulty)}>
+                  <Badge className={`${getDifficultyColor(module.difficulty)} text-xs shrink-0 self-start`}>
                     {getDifficultyLabel(module.difficulty)}
                   </Badge>
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6">
                 {/* Progress Bar */}
                 {progress && (
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span>Progress</span>
                       <span>{completionPercentage}%</span>
                     </div>
-                    <Progress value={completionPercentage} className="h-2" />
+                    <Progress value={completionPercentage} className="h-1.5 sm:h-2" />
                   </div>
                 )}
                 
                 {/* Module Statistics */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{module.problemCount} Problems</span>
+                <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">{module.problemCount} Problems</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{module.estimatedTime}min</span>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">{module.estimatedTime}min</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Calculator className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{module.keyFormulas} Formulas</span>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <Calculator className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">{module.keyFormulas} Formulas</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Lightbulb className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{module.applications} Applications</span>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">{module.applications} Apps</span>
                   </div>
                 </div>
 
-                {/* Learning Objectives Preview */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium flex items-center space-x-1">
-                    <Target className="h-4 w-4" />
+                {/* Learning Objectives Preview - Hidden on mobile, collapsible */}
+                <div className="hidden sm:block space-y-2">
+                  <h4 className="text-xs sm:text-sm font-medium flex items-center space-x-1">
+                    <Target className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>Key Learning Objectives</span>
                   </h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    {module.learningObjectives.map((objective, index) => (
-                      <li key={index} className="flex items-start space-x-2">
-                        <CheckCircle2 className="h-3 w-3 mt-1 text-green-600" />
-                        <span>{objective}</span>
+                  <ul className="text-xs sm:text-sm text-muted-foreground space-y-1">
+                    {module.learningObjectives.slice(0, 2).map((objective, index) => (
+                      <li key={index} className="flex items-start space-x-1 sm:space-x-2">
+                        <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mt-1 text-green-600 shrink-0" />
+                        <span className="line-clamp-1">{objective}</span>
                       </li>
                     ))}
+                    {module.learningObjectives.length > 2 && (
+                      <li className="text-xs text-muted-foreground/70">
+                        +{module.learningObjectives.length - 2} more objectives
+                      </li>
+                    )}
                   </ul>
                 </div>
 
-                {/* Prerequisites */}
+                {/* Prerequisites - Simplified for mobile */}
                 {module.prerequisites.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Prerequisites</h4>
+                  <div className="space-y-1 sm:space-y-2">
+                    <h4 className="text-xs sm:text-sm font-medium">Prerequisites</h4>
                     <div className="flex flex-wrap gap-1">
-                      {module.prerequisites.map((prereq, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                      {module.prerequisites.slice(0, 3).map((prereq, index) => (
+                        <Badge key={index} variant="outline" className="text-xs px-1.5 py-0.5">
                           {prereq}
                         </Badge>
                       ))}
+                      {module.prerequisites.length > 3 && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                          +{module.prerequisites.length - 3}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {/* User Progress Details */}
                 {progress && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-2 border-t">
                     <div className="text-center">
-                      <p className="text-lg font-semibold text-green-600">{progress.accuracy}%</p>
+                      <p className="text-sm sm:text-lg font-semibold text-green-600">{progress.accuracy}%</p>
                       <p className="text-xs text-muted-foreground">Accuracy</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-semibold text-blue-600">{progress.estimatedTimeRemaining}min</p>
+                      <p className="text-sm sm:text-lg font-semibold text-blue-600">{progress.estimatedTimeRemaining}min</p>
                       <p className="text-xs text-muted-foreground">Remaining</p>
                     </div>
                   </div>
@@ -284,11 +294,11 @@ export function EnhancedModulesView() {
 
                 {/* Action Button */}
                 <Button 
-                  className="w-full" 
+                  className="w-full text-xs sm:text-sm py-2 sm:py-3" 
                   variant={progress?.completed ? "secondary" : "default"}
                   data-testid={`start-module-${module.id}`}
                 >
-                  <PlayCircle className="h-4 w-4 mr-2" />
+                  <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   {progress?.completed ? 'Continue Practice' : 'Start Learning'}
                 </Button>
               </CardContent>
@@ -299,12 +309,12 @@ export function EnhancedModulesView() {
 
       {/* Deployment Package Attribution */}
       <Card className="border-dashed">
-        <CardContent className="p-6 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <Award className="h-5 w-5 text-amber-600" />
-            <span className="font-medium">Enhanced Problem Database</span>
+        <CardContent className="p-3 sm:p-6 text-center">
+          <div className="flex items-center justify-center space-x-1 sm:space-x-2 mb-2">
+            <Award className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+            <span className="text-sm sm:text-base font-medium">Enhanced Problem Database</span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Featuring 115+ comprehensive ACF practice problems with adaptive difficulty progression, 
             real-world applications, and detailed solution explanations. Optimized for Kellogg MBA placement exam preparation.
           </p>

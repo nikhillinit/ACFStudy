@@ -133,32 +133,32 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <GraduationCap className="text-white h-6 w-6" />
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center">
+                <GraduationCap className="text-white h-4 w-4 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">ACF Mastery Platform</h1>
-                <p className="text-sm text-gray-500">Welcome back, {typedUser.firstName || typedUser.email}</p>
+                <h1 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">ACF Mastery</h1>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Welcome back, {typedUser.firstName || typedUser.email}</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden md:flex items-center space-x-2">
                 {typedUser.profileImageUrl ? (
                   <img 
                     src={typedUser.profileImageUrl} 
                     alt="Profile" 
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <UserIcon className="h-4 w-4 text-gray-600" />
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                   </div>
                 )}
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs sm:text-sm font-medium text-gray-700">
                   {typedUser.firstName || typedUser.email}
                 </span>
               </div>
@@ -166,10 +166,11 @@ export default function Home() {
                 variant="outline" 
                 size="sm" 
                 onClick={handleLogout}
+                className="text-xs sm:text-sm py-1 sm:py-2 px-2 sm:px-3"
                 data-testid="button-logout"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
@@ -177,59 +178,59 @@ export default function Home() {
       </header>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-4 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
             Welcome to Your Learning Dashboard
           </h2>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Track your progress and continue your Advanced Corporate Finance journey.
           </p>
         </div>
 
         {/* Learning Statistics Overview */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold">Your ACF Mastery Journey</h3>
-            <Target className="h-6 w-6" />
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-3 sm:p-6 mb-4 sm:mb-8 text-white">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-lg sm:text-xl font-bold">Your ACF Mastery Journey</h3>
+            <Target className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold">{Math.round(overallProgress)}%</div>
-              <div className="text-sm opacity-90">Overall Mastery</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{Math.round(overallProgress)}%</div>
+              <div className="text-xs sm:text-sm opacity-90">Overall</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold">{learningStats.completedProblems}</div>
-              <div className="text-sm opacity-90">Problems Solved</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{learningStats.completedProblems}</div>
+              <div className="text-xs sm:text-sm opacity-90">Problems</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold">{learningStats.completedModules}</div>
-              <div className="text-sm opacity-90">Modules Completed</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">{learningStats.completedModules}</div>
+              <div className="text-xs sm:text-sm opacity-90">Modules</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold">1</div>
-              <div className="text-sm opacity-90">Day Streak</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">1</div>
+              <div className="text-xs sm:text-sm opacity-90">Day Streak</div>
             </div>
           </div>
         </div>
 
         {/* Learning Platform Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="modules">Enhanced Modules</TabsTrigger>
-            <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
-            <TabsTrigger value="practice">Practice</TabsTrigger>
-            <TabsTrigger value="diagnostic">Diagnostic</TabsTrigger>
-            <TabsTrigger value="drills">Morning Drills</TabsTrigger>
-            <TabsTrigger value="formulas">Formulas</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1">
+            <TabsTrigger value="dashboard" className="text-xs sm:text-sm">Dashboard</TabsTrigger>
+            <TabsTrigger value="modules" className="text-xs sm:text-sm">Modules</TabsTrigger>
+            <TabsTrigger value="learning-path" className="text-xs sm:text-sm">Path</TabsTrigger>
+            <TabsTrigger value="practice" className="text-xs sm:text-sm">Practice</TabsTrigger>
+            <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">Test</TabsTrigger>
+            <TabsTrigger value="drills" className="text-xs sm:text-sm">Drills</TabsTrigger>
+            <TabsTrigger value="formulas" className="text-xs sm:text-sm">Formulas</TabsTrigger>
           </TabsList>
 
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-6">
             {/* Module Progress Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {modules.map((module) => {
                 const IconComponent = topicIcons[module.title] || BookOpen;
                 const moduleProblems = problems.filter(p => p.topic === module.title);
@@ -238,41 +239,41 @@ export default function Home() {
                 
                 return (
                   <Card key={module.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <IconComponent className="h-6 w-6 text-blue-600" />
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                      <div className="flex items-start space-x-2 sm:space-x-3">
+                        <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg shrink-0">
+                          <IconComponent className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                         </div>
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{module.title}</CardTitle>
-                          <CardDescription className="text-sm">{module.description}</CardDescription>
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-sm sm:text-lg leading-tight">{module.title}</CardTitle>
+                          <CardDescription className="text-xs sm:text-sm line-clamp-2">{module.description}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between text-sm">
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="space-y-2 sm:space-y-3">
+                        <div className="flex justify-between text-xs sm:text-sm">
                           <span>Progress</span>
                           <span>{Math.round(progressPercent)}%</span>
                         </div>
-                        <Progress value={progressPercent} className="h-2" />
-                        <div className="flex justify-between items-center">
-                          <div className="text-sm text-gray-600">
+                        <Progress value={progressPercent} className="h-1.5 sm:h-2" />
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+                          <div className="text-xs sm:text-sm text-gray-600">
                             {completedCount}/{moduleProblems.length} problems
                           </div>
-                          <div className="flex space-x-2">
-                            <Badge variant="secondary">{module.category}</Badge>
-                            <Badge variant={module.difficulty === 1 ? "default" : module.difficulty === 2 ? "secondary" : "destructive"}>
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
+                            <Badge variant="secondary" className="text-xs">{module.category}</Badge>
+                            <Badge variant={module.difficulty === 1 ? "default" : module.difficulty === 2 ? "secondary" : "destructive"} className="text-xs">
                               {module.difficulty === 1 ? "Beginner" : module.difficulty === 2 ? "Intermediate" : "Advanced"}
                             </Badge>
                           </div>
                         </div>
                         <Button 
                           onClick={() => startPractice(module.title)} 
-                          className="w-full"
+                          className="w-full text-xs sm:text-sm py-2 sm:py-3"
                           data-testid={`button-start-${module.id}`}
                         >
-                          <PlayCircle className="h-4 w-4 mr-2" />
+                          <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           Start Practice
                         </Button>
                       </div>
@@ -294,34 +295,34 @@ export default function Home() {
           </TabsContent>
 
           {/* Practice Tab */}
-          <TabsContent value="practice" className="space-y-6">
+          <TabsContent value="practice" className="space-y-4 sm:space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Target className="h-5 w-5" />
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                  <Target className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span>Practice Mode</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Choose a topic to practice. Problems are selected based on your performance and areas that need improvement.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="p-3 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   {modules.map((module) => {
                     const IconComponent = topicIcons[module.title] || BookOpen;
                     return (
                       <Button
                         key={module.id}
                         variant="outline"
-                        className="h-auto p-4 justify-start"
+                        className="h-auto p-3 sm:p-4 justify-start text-left"
                         onClick={() => startPractice(module.title)}
                         data-testid={`button-practice-${module.id}`}
                       >
-                        <div className="flex items-center space-x-3">
-                          <IconComponent className="h-6 w-6" />
-                          <div className="text-left">
-                            <div className="font-medium">{module.title}</div>
-                            <div className="text-sm text-gray-500">{module.problemCount} Problems</div>
+                        <div className="flex items-center space-x-2 sm:space-x-3 w-full">
+                          <IconComponent className="h-4 w-4 sm:h-6 sm:w-6 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-xs sm:text-sm truncate">{module.title}</div>
+                            <div className="text-xs text-gray-500">{module.problemCount} Problems</div>
                           </div>
                         </div>
                       </Button>
