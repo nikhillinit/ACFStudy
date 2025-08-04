@@ -8,6 +8,9 @@ import { PracticeSession } from '@/components/practice-session';
 import { EnhancedQuiz } from '@/components/enhanced-quiz';
 import { NoteTaking } from '@/components/note-taking';
 import { GamifiedPractice } from '@/components/gamified-practice';
+import { FinancialStatementGame } from '@/components/FinancialStatementGame';
+import { ACFExamSimulator } from '@/components/ACFExamSimulator';
+import { PortfolioCalculator } from '@/components/PortfolioCalculator';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
@@ -18,7 +21,9 @@ import {
   PlayCircle,
   Award,
   CheckCircle2,
-  BarChart3
+  BarChart3,
+  Calculator,
+  FileText
 } from 'lucide-react';
 
 interface ACFProblem {
@@ -91,6 +96,7 @@ export default function PracticePage() {
     problems: ACFProblem[];
   } | null>(null);
   const [selectedTab, setSelectedTab] = useState('topics');
+  const [showInteractive, setShowInteractive] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -316,6 +322,64 @@ export default function PracticePage() {
           {/* Gamified Challenges Tab */}
           <TabsContent value="challenges" className="space-y-4 sm:space-y-6">
             <GamifiedPractice />
+            
+            {/* Interactive Tools Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Calculator className="h-6 w-6 text-blue-600" />
+                  <span>Interactive Learning Tools</span>
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Practice with hands-on calculators and interactive exercises
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <Card 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setShowInteractive('portfolio')}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <TrendingUp className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">Portfolio Calculator</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Risk-return analysis and diversification tools
+                      </p>
+                      <Button className="w-full" data-testid="launch-portfolio-calc">Launch Calculator</Button>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setShowInteractive('classification')}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <FileText className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">Classification Game</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Financial statement item classification challenge
+                      </p>
+                      <Button className="w-full" data-testid="launch-classification-game">Start Game</Button>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setShowInteractive('exam')}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <Award className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">ACF Exam Simulator</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Full placement exam simulation with timing
+                      </p>
+                      <Button className="w-full" data-testid="launch-exam-sim">Take Exam</Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Diagnostic Test Tab */}
@@ -417,6 +481,40 @@ export default function PracticePage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Interactive Component Modal */}
+      {showInteractive && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">
+                  {showInteractive === 'portfolio' && 'Portfolio Calculator'}
+                  {showInteractive === 'classification' && 'Financial Statement Classification Game'}
+                  {showInteractive === 'exam' && 'ACF Exam Simulator'}
+                </h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowInteractive(null)}
+                  data-testid="close-interactive"
+                >
+                  Close
+                </Button>
+              </div>
+              
+              {showInteractive === 'portfolio' && (
+                <PortfolioCalculator onComplete={() => setShowInteractive(null)} />
+              )}
+              {showInteractive === 'classification' && (
+                <FinancialStatementGame onComplete={() => setShowInteractive(null)} />
+              )}
+              {showInteractive === 'exam' && (
+                <ACFExamSimulator onComplete={() => setShowInteractive(null)} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

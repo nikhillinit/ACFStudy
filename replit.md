@@ -63,6 +63,15 @@ This is a comprehensive Advanced Corporate Finance (ACF) learning platform desig
 - **New Learning Page**: Replaced existing learning page with enhanced ACF Master content as primary interface
 - **Progressive Module Navigation**: Created smooth transition between module overview and detailed content study
 
+### Enhanced Interactive Learning Tools (Latest - January 2025)
+- **Financial Statement Classification Game**: Timed classification challenge with 20 accounting items, 5-minute timer, and instant feedback
+- **ACF Exam Simulator**: Full placement exam simulation with 10 questions across all competency areas and 2-hour time limit
+- **Portfolio Calculator**: Interactive risk-return calculator with correlation analysis, preset portfolios, and practice problems
+- **Modal-Based Interface**: Seamless overlay system for launching interactive tools from practice challenges tab
+- **Performance Tracking**: Integrated scoring, timing, and detailed solution explanations for all interactive components
+- **Mobile-Responsive Design**: Fully responsive interactive tools that work across all device sizes
+- **Gamified Learning**: Speed challenges, accuracy targets, and achievement-based feedback systems
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
