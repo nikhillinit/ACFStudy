@@ -48,8 +48,20 @@ export default function Home() {
     enabled: !!typedUser?.id,
   });
 
-  // Calculate learning statistics
-  const learningStats = {
+  const { data: dashboardData } = useQuery({
+    queryKey: ["/api/analytics/dashboard"],
+    enabled: !!typedUser?.id,
+  });
+
+  // Use enhanced analytics data if available, fallback to calculated stats
+  const dashboardStats = dashboardData?.dashboard;
+  const learningStats = dashboardStats ? {
+    totalProblems: dashboardStats.totalProblems,
+    completedProblems: dashboardStats.totalCompleted,
+    totalModules: modules.length,
+    completedModules: Object.values(dashboardStats.topicStats || {}).filter((topic: any) => topic.percentage > 0).length,
+    averageScore: dashboardStats.overallAccuracy
+  } : {
     totalProblems: problems.length,
     completedProblems: userProgress.reduce((sum: number, progress: any) => sum + (progress.score || 0), 0),
     totalModules: modules.length,
@@ -58,8 +70,8 @@ export default function Home() {
       userProgress.reduce((sum: any, progress: any) => sum + (progress.score || 0), 0) / userProgress.length : 0
   };
 
-  const overallProgress = learningStats.totalProblems > 0 ? 
-    (learningStats.completedProblems / learningStats.totalProblems) * 100 : 0;
+  const overallProgress = dashboardStats?.overallProgress || (learningStats.totalProblems > 0 ? 
+    (learningStats.completedProblems / learningStats.totalProblems) * 100 : 0);
 
   // Topic icons mapping
   const topicIcons: Record<string, React.ComponentType<any>> = {

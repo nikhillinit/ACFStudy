@@ -1,0 +1,32 @@
+{
+  "name": "acf-interactive-learning",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered Advanced Corporate Finance learning module",
+  "main": "demo.html",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx live-server --port=3000 --open=demo.html",
+    "build": "echo 'Static HTML project - no build needed'",
+    "test": "echo 'Tests not implemented yet'"
+  },
+  "keywords": [
+    "finance",
+    "education",
+    "ai",
+    "learning",
+    "corporate-finance"
+  ],
+  "author": "Private",
+  "dependencies": {
+    "serve": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
