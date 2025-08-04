@@ -1,238 +1,274 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { 
-  GraduationCap, 
   BookOpen, 
-  TrendingUp, 
+  Brain, 
+  Target, 
   Users, 
-  CheckCircle, 
+  Trophy,
+  BarChart3,
+  Zap,
+  Star,
+  CheckCircle2,
   ArrowRight,
-  Server,
-  Database,
-  Plug
-} from "lucide-react";
+  Play
+} from 'lucide-react';
 
 export default function Landing() {
-  const handleLogin = () => {
-    window.location.href = "/api/login";
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <GraduationCap className="text-white h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">ACF Mastery Platform</h1>
-                <p className="text-sm text-gray-500">Advanced Corporate Finance</p>
-              </div>
-            </div>
-            
-            {/* Server Status Indicator */}
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600 font-medium">Server Active</span>
-            </div>
+      <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <Brain className="h-8 w-8 text-purple-400" />
+            <span className="text-xl font-bold text-white">ACF Mastery</span>
           </div>
+          <Button 
+            onClick={() => window.location.href = '/api/login'}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+            data-testid="login-button"
+          >
+            Get Started
+          </Button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="outline" className="mb-6 px-4 py-2">
-              Infrastructure Ready
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Master Advanced 
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Corporate Finance</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Comprehensive learning platform designed to help students excel in advanced corporate finance concepts through interactive learning and practice.
-            </p>
+      {/* Hero Section */}
+      <section className="py-20 text-center">
+        <div className="container mx-auto px-4">
+          <Badge className="mb-6 bg-purple-600/20 text-purple-200 border-purple-500/30" variant="outline">
+            AI-Powered Learning Platform
+          </Badge>
+          
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            Master Advanced
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              {" "}Corporate Finance
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            Transform your ACF exam preparation with our comprehensive platform featuring 115+ practice problems, 
+            AI-powered tutoring, real-time performance tracking, and personalized learning paths.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={handleLogin}
               size="lg" 
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg"
-              data-testid="button-login"
+              onClick={() => window.location.href = '/api/login'}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg"
+              data-testid="hero-login-button"
             >
-              Start Learning <ArrowRight className="ml-2 h-5 w-5" />
+              <Play className="mr-2 h-5 w-5" />
+              Start Learning Now
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg"
+            >
+              View Demo
             </Button>
           </div>
-        </section>
-
-        {/* Infrastructure Status */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Platform Infrastructure
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Express Server */}
-              <Card className="border-green-200 bg-green-50">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <Server className="h-6 w-6 text-green-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Express Server</h3>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600 font-medium">Running on Port 5000</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    CORS enabled, JSON parsing, static file serving
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Database */}
-              <Card className="border-blue-200 bg-blue-50">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <Database className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Database</h3>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-blue-600 font-medium">Connected</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    User management, progress tracking, sessions
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* API Endpoints */}
-              <Card className="border-purple-200 bg-purple-50">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <Plug className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">API Routes</h3>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm text-purple-600 font-medium">Active</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Authentication, progress, modules endpoints
-                  </p>
-                </CardContent>
-              </Card>
+          
+          <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">115+</div>
+              <div className="text-gray-400">Practice Problems</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">5</div>
+              <div className="text-gray-400">Core Topics</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">AI</div>
+              <div className="text-gray-400">Powered Tutor</div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Features Preview */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Platform Features
+      {/* Features Section */}
+      <section className="py-20 bg-black/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Complete ACF Learning Ecosystem
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center">
-                <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Interactive Learning</h3>
-                <p className="text-sm text-gray-600">
-                  Comprehensive modules covering all ACF topics
-                </p>
-              </div>
-              <div className="text-center">
-                <TrendingUp className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Progress Tracking</h3>
-                <p className="text-sm text-gray-600">
-                  Monitor your learning progress in real-time
-                </p>
-              </div>
-              <div className="text-center">
-                <Users className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">User Management</h3>
-                <p className="text-sm text-gray-600">
-                  Secure authentication and user profiles
-                </p>
-              </div>
-              <div className="text-center">
-                <CheckCircle className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Achievement System</h3>
-                <p className="text-sm text-gray-600">
-                  Track achievements and milestones
-                </p>
-              </div>
-            </div>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Everything you need to master Advanced Corporate Finance, powered by cutting-edge AI technology
+            </p>
           </div>
-        </section>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <Brain className="h-12 w-12 text-purple-400 mb-4" />
+                <CardTitle>AI-Powered Tutoring</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Get personalized explanations and guidance from advanced AI models including Claude, 
+                  OpenAI, and Perplexity for comprehensive learning support.
+                </p>
+              </CardContent>
+            </Card>
 
-        {/* API Endpoints Preview */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-900">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-white mb-8">
-              API Endpoints Ready
-            </h2>
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
-                <div className="grid md:grid-cols-2 gap-6 text-sm font-mono">
-                  <div className="space-y-2">
-                    <div className="text-green-400">POST /api/auth/login</div>
-                    <div className="text-blue-400">GET  /api/auth/user</div>
-                    <div className="text-green-400">POST /api/progress/save</div>
-                    <div className="text-blue-400">GET  /api/progress/:userId</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-blue-400">GET  /api/modules</div>
-                    <div className="text-blue-400">GET  /api/modules/:id</div>
-                    <div className="text-green-400">POST /api/sessions</div>
-                    <div className="text-blue-400">GET  /api/health</div>
-                  </div>
-                </div>
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <BarChart3 className="h-12 w-12 text-blue-400 mb-4" />
+                <CardTitle>Real-Time Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Track your performance with live analytics, competency mapping, 
+                  and predictive scoring during practice sessions and exams.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <Target className="h-12 w-12 text-green-400 mb-4" />
+                <CardTitle>Adaptive Learning</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Personalized learning paths that adapt to your strengths and weaknesses, 
+                  ensuring efficient and targeted exam preparation.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <BookOpen className="h-12 w-12 text-yellow-400 mb-4" />
+                <CardTitle>Comprehensive Content</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  115+ practice problems across 5 core topics including Time Value of Money, 
+                  Portfolio Theory, Bond Valuation, and Financial Statements.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <Zap className="h-12 w-12 text-orange-400 mb-4" />
+                <CardTitle>Interactive Tools</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Gamified practice sessions, portfolio calculators, exam simulators, 
+                  and interactive financial statement classification games.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10 text-white">
+              <CardHeader>
+                <Trophy className="h-12 w-12 text-pink-400 mb-4" />
+                <CardTitle>Exam Simulation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Full ACF placement exam simulation with timing, real-time performance tracking, 
+                  and detailed competency analysis.
+                </p>
               </CardContent>
             </Card>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-6">
-              Ready to Master Corporate Finance?
+      {/* Learning Topics Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Master 5 Core ACF Topics
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Join our platform and start your journey to ACF mastery today.
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Comprehensive coverage of all essential Advanced Corporate Finance concepts
             </p>
-            <Button 
-              onClick={handleLogin}
-              size="lg" 
-              variant="secondary"
-              className="px-8 py-4 text-lg"
-              data-testid="button-cta-login"
-            >
-              Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
           </div>
-        </section>
-      </main>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[
+              { name: "Time Value of Money", problems: "25+" },
+              { name: "Portfolio Theory", problems: "23+" },
+              { name: "Bond Valuation", problems: "22+" },
+              { name: "Financial Statements", problems: "25+" },
+              { name: "Derivatives", problems: "20+" }
+            ].map((topic, index) => (
+              <Card key={index} className="bg-white/5 border-white/10 text-white text-center">
+                <CardHeader>
+                  <CheckCircle2 className="h-8 w-8 text-green-400 mx-auto mb-2" />
+                  <CardTitle className="text-lg">{topic.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Badge variant="outline" className="border-green-500/30 text-green-400">
+                    {topic.problems} Problems
+                  </Badge>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-purple-600/20 to-pink-600/20">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Transform Your ACF Preparation?
+          </h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join students who are mastering Advanced Corporate Finance with our AI-powered learning platform
+          </p>
+          
+          <Button 
+            size="lg" 
+            onClick={() => window.location.href = '/api/login'}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-4 text-xl"
+            data-testid="cta-login-button"
+          >
+            Start Your Journey
+            <ArrowRight className="ml-2 h-6 w-6" />
+          </Button>
+          
+          <div className="mt-8 flex justify-center items-center space-x-4 text-gray-400">
+            <div className="flex items-center">
+              <Star className="h-4 w-4 text-yellow-400 mr-1" />
+              <span>AI-Powered</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center">
+              <Users className="h-4 w-4 text-blue-400 mr-1" />
+              <span>Personalized</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center">
+              <Trophy className="h-4 w-4 text-green-400 mr-1" />
+              <span>Exam Ready</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-gray-500 mb-4 md:mb-0">
-              <span>Infrastructure ready for content integration</span>
-            </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span>React Application Loaded</span>
-              <span>•</span>
-              <span>Database Schema Active</span>
-              <span>•</span>
-              <span>Authentication Ready</span>
-            </div>
+      <footer className="border-t border-white/10 bg-black/20 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <Brain className="h-6 w-6 text-purple-400" />
+            <span className="text-lg font-semibold text-white">ACF Mastery Platform</span>
           </div>
+          <p className="text-gray-400">
+            Advanced Corporate Finance • AI-Powered Learning • Exam Preparation
+          </p>
         </div>
       </footer>
     </div>

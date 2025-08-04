@@ -59,32 +59,36 @@ export class EnhancedAuthManager {
 // Rate limiting configurations
 export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per window
+    max: 50, // 50 attempts per window
     message: {
         error: 'Too many authentication attempts, please try again later.'
     },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: false,
 });
 
 export const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per window
+    max: 1000, // 1000 requests per window
     message: {
         error: 'Too many requests, please try again later.'
     },
+    // Disable trust proxy validation for development
+    validate: false,
     standardHeaders: true,
     legacyHeaders: false,
 });
 
 export const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 30, // 30 API calls per minute
+    max: 300, // 300 API calls per minute
     message: {
         error: 'API rate limit exceeded, please slow down.'
     },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: false,
 });
 
 // Security headers middleware
