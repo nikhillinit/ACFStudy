@@ -1,0 +1,103 @@
+Below is a structured “first‑pass” technical review of ACFStudy.zip.  I focused on portability, build/run‐time correctness, security hygiene, and maintainability.  Because the archive contains >1 000 files, the findings highlight recurring or high‑impact items rather than an exhaustive line‑by‑line audit.
+
+⸻
+
+1 · Project layout & build pipeline
+
+Topic	Observation	Why it matters	Suggested remedy
+Monorepo hygiene	The zip bundles a web app (client/, server/, learning‑modules/), a React Native mobile app (mobile‑app/), and a full .git history plus many attached_assets/… timestamped snapshots.	Increases clone size (≈90 MB uncompressed) and makes CI slower.	Remove .git, .config, attached_assets/… and other build artefacts before packaging; consider a multi‑package workspace (pnpm / npm‑workspaces / TurboRepo) so each app has isolated dependencies.
+Build scripts	build runsvite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist	Good separation (client VS SSR API), but the esbuild line emits ES‑modules while start launches with plain node dist/index.js. Node will succeed only if package.json contains "type": "module" (it does) and consumers run Node ≥ 18.	Add an engines stanza or nvmrc to pin a minimum Node version; add CI test to catch accidental CommonJS imports.
+Cross‑platform env var	Scripts use NODE_ENV=development … (Unix syntax). On Windows shells this fails.	New contributors on Windows will get a “‘NODE_ENV’ is not recognized” error.	Swap to cross-env NODE_ENV=development tsx server/index.ts or set via dotenv-expand.
+Type‑checking	check runs tsc but the repo uses tsx (esbuild) for dev. There is no pre‑commit / pre‑push hook enforcing tsc --noEmit.	Runtime type errors can hide until production.	Add npm run check to CI; enable "skipLibCheck": false only if type issues are resolved.
+
+
+⸻
+
+2 · Runtime configuration
+
+Item	Status	Impact if missing
+DATABASE_URL, JWT_SECRET, SESSION_SECRET	Required by Drizzle & auth middleware; no default or .env.example present.	Server fails on boot or silently creates an in‑memory DB.
+OPENAI_API_KEY, PERPLEXITY_API_KEY, CLAUDE_API_KEY	Referenced from client/src/components/ai‑study‑companion.tsx and other AI helpers.	Calls to LLMs will throw 401/429.
+ISSUER_URL	Used in OIDC flow but undocumented.	Login flow breaks.
+
+Action →  Add a committed env.example that lists every key, purpose, and expected format.
+
+⸻
+
+3 · Code‑quality hotspots
+
+File(s)	Issue	Notes
+mobile-app/src/screens/HomeScreen.tsx	TODO: marker left in UI code.	Should be resolved or tracked in issue tracker.
+18 client/server scripts	console.log() and console.error() left in production paths.	Replace with structured logger (pino / winston) and configure log levels.
+client/src/components/micro-interactions.tsx	Direct DOM mutation inside React hook.	Can break React concurrent rendering; refactor to useRef.
+server/vite.ts	Swaps res.json prototype at runtime for logging. Clever but fragile – interferes with other middleware (e.g., Sentry).	Prefer a response‑time middleware such as morgan + on-headers.
+
+
+⸻
+
+4 · Dependency & security scan
+
+Package manifest excerpts
+
+"dependencies": {
+  "@trpc/server": "^10.45.0",
+  "drizzle-orm": "0.30.x",
+  "express": "^4.19.2",
+  "openai": "^4.26.0",
+  ...
+},
+"devDependencies": {
+  "tsx": "^4.19.1",
+  "vite": "^5.2.8",
+  ...
+}
+
+Findings
+	•	79 prod‑deps is high for an MVP; audit weekly with npm audit --omit=dev and lock major versions.
+	•	Drizzle 0.30 → 0.33 fixes a SQL‑injection edge‑case; upgrade.
+	•	tailwindcss is a direct dep but postcss plugins live in devDeps – fine.
+	•	Check for duplicate React versions between web and mobile (ReactDOM 19 vs React Native 0.74 alpha).
+
+⸻
+
+5 · Documentation & DX
+	•	README gaps – Only module‑specific READMEs exist; root setup (install, seed, build, test, deploy) is missing.
+	•	DB migrations – drizzle-kit push script exists, but no /migrations folder under version control.
+	•	Testing – No Jest/Playwright config; add at least one CI smoke test (npm run build && node dist/index.js --dry-run).
+
+⸻
+
+6 · Mobile app (React Native)
+	•	Uses Expo SDK 50 (beta) while web runs React 19 RC; keep React versions in harmony.
+	•	MOBILE_APP_SETUP.md references EAS Build, but app.json is not included.
+	•	Missing iOS/Android splash assets; npm run expo prebuild currently fails.
+
+⸻
+
+7 · Asset bloat
+	•	attached_assets/*.tsx|js|html are timestamped one‑off copies (likely from Replit “forks”).
+	•	.local/state/replit/… contains 400 + design snapshots.
+	•	Remove or .gitignore these to cut repo size by ~65 %.
+
+⸻
+
+8 · Quick‑win action list
+	1.	Create README.md with: prerequisites, env vars table, one‑line setup (npm i && npm run db:push && npm run dev).
+	2.	Commit .env.example (see section 2).
+	3.	Prune archive – Delete .git, .local, attached_assets, build artefacts.
+	4.	Add CI: pnpm → lint, tsc --noEmit, npm audit, npm run test.
+	5.	Upgrade high‑risk deps (Drizzle, OpenAI SDK) & run npm audit fix --force cautiously.
+	6.	Replace ad‑hoc logging with pino, wire to Vite dev server & production.
+	7.	Refactor any remaining TODO / FIXME before merge.
+
+⸻
+
+Overall assessment
+
+The codebase is thoughtfully structured and builds locally, but it still reflects an early “hackathon” phase.
+Most issues are about operational polish rather than deep architectural flaws:
+	•	Missing documented environment variables & migrations will block a clean deploy.
+	•	Cross‑platform script portability and CI coverage need attention.
+	•	Extraneous assets and Git history inflate size but are easy to remove.
+
+Addressing the quick‑wins above should make the repository production‑ready and friendlier for collaborators or open‑source contributors.

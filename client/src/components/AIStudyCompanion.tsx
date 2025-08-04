@@ -5,8 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useLocalProgress } from '@/hooks/useLocalProgress';
 
 interface CompanionMessage {
   id: string;
@@ -106,57 +105,32 @@ const MILESTONE_MESSAGES = {
 
 export function AIStudyCompanion() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { 
+    companionSettings, 
+    updateCompanionSettings, 
+    getAnalytics, 
+    getRecentActivity 
+  } = useLocalProgress();
+  
   const [activeMessage, setActiveMessage] = useState<CompanionMessage | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [messageQueue, setMessageQueue] = useState<CompanionMessage[]>([]);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Fetch companion settings
-  const { data: settings } = useQuery({
-    queryKey: ['/api/companion/settings'],
-    enabled: !!user,
-  });
+  // Use local storage data
+  const settings = companionSettings;
+  const analytics = getAnalytics();
+  const recentActivity = getRecentActivity();
 
-  // Fetch study analytics for contextualized messages
-  const { data: analytics } = useQuery({
-    queryKey: ['/api/analytics/study-patterns'],
-    enabled: !!user,
-  });
-
-  // Fetch recent activity for triggering messages
-  const { data: recentActivity } = useQuery({
-    queryKey: ['/api/analytics/recent-activity'],
-    enabled: !!user,
-    refetchInterval: 30000, // Check every 30 seconds
-  });
-
-  // Update companion settings
-  const updateSettingsMutation = useMutation({
-    mutationFn: async (newSettings: Partial<CompanionSettings>) => {
-      return apiRequest('/api/companion/settings', {
-        method: 'PATCH',
-        body: newSettings,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/companion/settings'] });
-    },
-  });
-
-  // Log companion interaction
-  const logInteractionMutation = useMutation({
-    mutationFn: async (interaction: { type: string; messageId: string; action: string }) => {
-      return apiRequest('/api/companion/interactions', {
-        method: 'POST',
-        body: interaction,
-      });
-    },
-  });
+  // Log companion interaction (local storage)
+  const logInteraction = (interaction: { type: string; messageId: string; action: string }) => {
+    console.log('Companion interaction:', interaction);
+    // Could save to localStorage if needed
+  };
 
   // Generate contextual messages based on activity
   const generateMessage = (context: any): CompanionMessage | null => {
-    if (!settings || !analytics) return null;
+    if (!settings) return null;
 
     const personality = COMPANION_PERSONALITIES[settings.encouragementStyle];
     const messages = ENCOURAGEMENT_MESSAGES[settings.encouragementStyle];
@@ -227,7 +201,7 @@ export function AIStudyCompanion() {
 
   // Monitor for new activities to trigger messages
   useEffect(() => {
-    if (recentActivity && analytics) {
+    if (recentActivity) {
       const newMessage = generateMessage({
         problemsSolved: analytics.totalProblems,
         studyStreak: analytics.studyStreak,
@@ -243,7 +217,7 @@ export function AIStudyCompanion() {
 
   const handleMessageDismiss = () => {
     if (activeMessage) {
-      logInteractionMutation.mutate({
+      logInteraction({
         type: 'dismiss',
         messageId: activeMessage.id,
         action: 'manual_dismiss'
@@ -255,7 +229,7 @@ export function AIStudyCompanion() {
 
   const handleMessageAction = (action: string) => {
     if (activeMessage) {
-      logInteractionMutation.mutate({
+      logInteraction({
         type: 'action',
         messageId: activeMessage.id,
         action
@@ -270,16 +244,7 @@ export function AIStudyCompanion() {
     handleMessageDismiss();
   };
 
-  const defaultSettings: CompanionSettings = {
-    frequency: 'moderate',
-    encouragementStyle: 'supportive',
-    showCelebrations: true,
-    showTips: true,
-    showProgress: true,
-    personalizedName: user?.name || 'Student'
-  };
-
-  const currentSettings = settings || defaultSettings;
+  const currentSettings = settings;
   const personality = COMPANION_PERSONALITIES[currentSettings.encouragementStyle];
 
   return (
@@ -386,7 +351,7 @@ export function AIStudyCompanion() {
                         key={key}
                         variant={currentSettings.encouragementStyle === key ? "default" : "outline"}
                         size="sm"
-                        onClick={() => updateSettingsMutation.mutate({ encouragementStyle: key as any })}
+                        onClick={() => updateCompanionSettings({ encouragementStyle: key as any })}
                         className="flex items-center gap-2"
                         data-testid={`button-personality-${key}`}
                       >
@@ -405,7 +370,7 @@ export function AIStudyCompanion() {
                         key={freq}
                         variant={currentSettings.frequency === freq ? "default" : "outline"}
                         size="sm"
-                        onClick={() => updateSettingsMutation.mutate({ frequency: freq as any })}
+                        onClick={() => updateCompanionSettings({ frequency: freq as any })}
                         data-testid={`button-frequency-${freq}`}
                       >
                         {freq}
@@ -419,7 +384,7 @@ export function AIStudyCompanion() {
                     <input
                       type="checkbox"
                       checked={currentSettings.showCelebrations}
-                      onChange={(e) => updateSettingsMutation.mutate({ showCelebrations: e.target.checked })}
+                      onChange={(e) => updateCompanionSettings({ showCelebrations: e.target.checked })}
                       data-testid="checkbox-celebrations"
                     />
                     <span className="text-sm">Show celebration messages</span>
@@ -428,7 +393,7 @@ export function AIStudyCompanion() {
                     <input
                       type="checkbox"
                       checked={currentSettings.showTips}
-                      onChange={(e) => updateSettingsMutation.mutate({ showTips: e.target.checked })}
+                      onChange={(e) => updateCompanionSettings({ showTips: e.target.checked })}
                       data-testid="checkbox-tips"
                     />
                     <span className="text-sm">Show study tips</span>
@@ -437,7 +402,7 @@ export function AIStudyCompanion() {
                     <input
                       type="checkbox"
                       checked={currentSettings.showProgress}
-                      onChange={(e) => updateSettingsMutation.mutate({ showProgress: e.target.checked })}
+                      onChange={(e) => updateCompanionSettings({ showProgress: e.target.checked })}
                       data-testid="checkbox-progress"
                     />
                     <span className="text-sm">Show progress updates</span>

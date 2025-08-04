@@ -12,6 +12,7 @@ import { FinancialStatementGame } from '@/components/FinancialStatementGame';
 import { ACFExamSimulator } from '@/components/ACFExamSimulator';
 import { PortfolioCalculator } from '@/components/PortfolioCalculator';
 import { RealTimeExamTracker } from '@/components/RealTimeExamTracker';
+import { StudyProgressTracker } from '@/components/StudyProgressTracker';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
@@ -91,7 +92,7 @@ const topics = [
   }
 ];
 
-export default function PracticePage() {
+function PracticePage() {
   const [activeSession, setActiveSession] = useState<{
     topic: string;
     problems: ACFProblem[];
@@ -535,5 +536,14 @@ export default function PracticePage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Wrap with StudyProgressTracker for micro-interactions and progress tracking
+export default function Practice() {
+  return (
+    <StudyProgressTracker>
+      <PracticePage />
+    </StudyProgressTracker>
   );
 }
