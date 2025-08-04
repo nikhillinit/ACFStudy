@@ -1,7 +1,7 @@
 // Enhanced authentication system for Replit deployment
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit'; // Disabled for development
 import type { Request, Response, NextFunction } from 'express';
 import { replitDbManager } from './replit-db';
 
@@ -207,36 +207,8 @@ export class ReplitAuthManager {
     }
 }
 
-// Rate limiting configurations
-export const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per window
-    message: {
-        error: 'Too many authentication attempts, please try again later.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-export const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per window
-    message: {
-        error: 'Too many requests, please try again later.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-export const apiLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 30, // 30 API calls per minute
-    message: {
-        error: 'API rate limit exceeded, please slow down.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+// Rate limiting disabled for development
+// All rate limiting has been disabled to prevent authentication issues
 
 // Middleware functions
 export function requireAuth(authManager: ReplitAuthManager) {

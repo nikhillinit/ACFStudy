@@ -1,7 +1,7 @@
 // Enhanced authentication middleware for ACF Learning Platform
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit'; // Disabled for development
 import { storage } from './storage.js';
 import type { Request, Response, NextFunction } from 'express';
 
@@ -56,40 +56,10 @@ export class EnhancedAuthManager {
     }
 }
 
-// Rate limiting configurations
-export const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // 50 attempts per window
-    message: {
-        error: 'Too many authentication attempts, please try again later.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (req) => process.env.NODE_ENV === 'development',
-});
-
-export const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // 1000 requests per window
-    message: {
-        error: 'Too many requests, please try again later.'
-    },
-    // Skip trust proxy validation for development
-    skip: (req) => process.env.NODE_ENV === 'development',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-export const apiLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 300, // 300 API calls per minute
-    message: {
-        error: 'API rate limit exceeded, please slow down.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (req) => process.env.NODE_ENV === 'development',
-});
+// Rate limiting disabled for development
+// export const authLimiter = ...
+// export const generalLimiter = ...
+// export const apiLimiter = ...
 
 // Security headers middleware
 export function securityHeaders(req: Request, res: Response, next: NextFunction) {

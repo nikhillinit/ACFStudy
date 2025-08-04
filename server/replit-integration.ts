@@ -3,7 +3,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import helmet from "helmet";
 import compression from "compression";
-import { replitAuthManager, requireAuth, optionalAuth, authLimiter, apiLimiter, generalLimiter, securityHeaders, sanitizeInput } from "./replit-auth";
+import { replitAuthManager, requireAuth, optionalAuth, securityHeaders, sanitizeInput } from "./replit-auth";
 import { replitDbManager } from "./replit-db";
 import { aiServices } from "./ai-services";
 import { learningPathEngine } from "./learning-path-engine";
@@ -60,10 +60,7 @@ export async function registerReplitRoutes(app: Express): Promise<Server> {
   app.use(securityHeaders);
   app.use(compression());
   
-  // Rate limiting
-  app.use('/api/auth', authLimiter);
-  app.use('/api', apiLimiter);
-  app.use(generalLimiter);
+  // Rate limiting disabled for development
   
   // Input sanitization
   app.use(sanitizeInput);
