@@ -13,6 +13,9 @@ import {
   ArrowRight,
   RotateCcw
 } from 'lucide-react';
+import { AIStudyCompanion } from '@/components/ai-study-companion';
+import { useMicroInteractions } from '@/components/micro-interactions';
+import { useStudyCompanion } from '@/hooks/useStudyCompanion';
 
 interface ACFProblem {
   id: string;
@@ -44,6 +47,34 @@ export function PracticeSession({ topic, problems, onComplete, onExit }: Practic
   const [problemStartTime, setProblemStartTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
   const [hintsShown, setHintsShown] = useState(0);
+
+  // Initialize study companion
+  const { 
+    companionData, 
+    recordProblemCompletion, 
+    updateCompanionMood,
+    getSessionStats 
+  } = useStudyCompanion({
+    currentContext: {
+      page: 'practice',
+      topic: topic,
+      difficulty: currentProblem?.difficulty?.toString()
+    }
+  });
+
+  // Initialize micro-interactions
+  const { checkForMicroInteractions } = useMicroInteractions({
+    userProgress: companionData.userProgress,
+    sessionData: {
+      problemsCompleted: sessionResults.length,
+      correctAnswers: sessionResults.filter(r => r.isCorrect).length,
+      timeSpent: Date.now() - startTime,
+      difficulty: currentProblem?.difficulty?.toString() || 'medium'
+    },
+    onInteraction: (interaction) => {
+      console.log('Micro-interaction triggered:', interaction);
+    }
+  });
 
   const currentProblem = problems[currentIndex];
   const isLastProblem = currentIndex === problems.length - 1;
@@ -87,6 +118,25 @@ export function PracticeSession({ topic, problems, onComplete, onExit }: Practic
     const correct = validateAnswer(userAnswer, currentProblem.answer);
     setIsCorrect(correct);
     setShowFeedback(true);
+
+    // Record with study companion
+    recordProblemCompletion(correct);
+
+    // Trigger micro-interactions
+    checkForMicroInteractions();
+
+    // Update companion mood based on performance
+    const currentAccuracy = sessionResults.length > 0 
+      ? (sessionResults.filter(r => r.isCorrect).length + (correct ? 1 : 0)) / (sessionResults.length + 1) * 100
+      : (correct ? 100 : 0);
+    
+    if (currentAccuracy >= 80) {
+      updateCompanionMood('proud');
+    } else if (currentAccuracy >= 60) {
+      updateCompanionMood('encouraging');
+    } else {
+      updateCompanionMood('focused');
+    }
 
     // Record result
     const result = {
@@ -317,6 +367,32 @@ export function PracticeSession({ topic, problems, onComplete, onExit }: Practic
           )}
         </CardContent>
       </Card>
+
+      {/* AI Study Companion */}
+      {companionData.shouldShow && (
+        <AIStudyCompanion
+          userProgress={{
+            ...companionData.userProgress,
+            recentActivity: sessionResults,
+            lastStudySession: new Date()
+          }}
+          currentContext={{
+            page: 'practice',
+            topic: topic,
+            difficulty: currentProblem?.difficulty?.toString(),
+            timeSpent: Date.now() - startTime
+          }}
+          onDismiss={() => {
+            // Companion will handle hiding itself
+          }}
+          onInteraction={(type, data) => {
+            if (type === 'start_practice') {
+              // Could navigate to specific topic
+              console.log('Start practice interaction:', data);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

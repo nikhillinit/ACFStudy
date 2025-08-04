@@ -32,12 +32,22 @@ import { AITutor } from "@/components/ai-tutor";
 import { LearningPathDashboard } from "@/components/learning-path";
 import { EnhancedModulesView } from "@/components/enhanced-modules";
 import { EnhancedProgressTracker } from "@/components/enhanced-progress-tracker";
+import { AIStudyCompanion } from "@/components/ai-study-companion";
+import { useStudyCompanion } from "@/hooks/useStudyCompanion";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const [showAITutor, setShowAITutor] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState("");
+
+  // Initialize study companion
+  const { companionData } = useStudyCompanion({
+    userId: user?.id,
+    currentContext: {
+      page: 'home'
+    }
+  });
 
   // Type guard for user data
   const typedUser = user as User | undefined;
@@ -500,6 +510,23 @@ export default function Home() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI Study Companion */}
+      {companionData.shouldShow && (
+        <AIStudyCompanion
+          userProgress={companionData.userProgress}
+          currentContext={companionData.currentContext}
+          onDismiss={() => {
+            // Companion handles hiding itself
+          }}
+          onInteraction={(type, data) => {
+            if (type === 'start_practice') {
+              // Navigate to practice page with specific topic
+              window.location.href = `/practice?topic=${encodeURIComponent(data.topic)}`;
+            }
+          }}
+        />
       )}
     </div>
   );
