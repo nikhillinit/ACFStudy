@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PracticeSession } from '@/components/practice-session';
+import { EnhancedQuiz } from '@/components/enhanced-quiz';
+import { NoteTaking } from '@/components/note-taking';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
@@ -101,12 +103,15 @@ export default function PracticePage() {
   // Start practice session mutation
   const startPracticeMutation = useMutation({
     mutationFn: async ({ topic, count }: { topic: string; count: number }) => {
-      return await apiRequest(`/api/practice/problems/${topic}?count=${count}`);
+      return await apiRequest(`/api/practice/problems/${topic}?count=${count}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data: any, variables) => {
       setActiveSession({
         topic: variables.topic,
-        problems: data.problems
+        problems: data.problems || []
       });
     },
     onError: (error) => {
@@ -123,14 +128,16 @@ export default function PracticePage() {
     mutationFn: async (sessionResults: any) => {
       return await apiRequest('/api/practice/session/complete', {
         method: 'POST',
-        body: { sessionResults }
+        body: JSON.stringify({ sessionResults }),
+        headers: { 'Content-Type': 'application/json' }
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
+      const performance = data.performance || {};
       toast({
         title: "Session Complete!",
-        description: `Accuracy: ${Math.round(data.performance.accuracy)}% | ${data.performance.topicMastery ? 'Topic Mastered!' : 'Keep practicing!'}`,
-        variant: data.performance.topicMastery ? "default" : "destructive"
+        description: `Accuracy: ${Math.round(performance.accuracy || 0)}% | ${performance.topicMastery ? 'Topic Mastered!' : 'Keep practicing!'}`,
+        variant: performance.topicMastery ? "default" : "destructive"
       });
       setActiveSession(null);
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
@@ -149,10 +156,11 @@ export default function PracticePage() {
   };
 
   const handleStartDiagnostic = () => {
-    if (diagnosticData?.problems) {
+    const diagnosticProblems = (diagnosticData as any)?.problems || [];
+    if (diagnosticProblems.length > 0) {
       setActiveSession({
         topic: 'Diagnostic Test',
-        problems: diagnosticData.problems
+        problems: diagnosticProblems
       });
     }
   };
@@ -218,10 +226,11 @@ export default function PracticePage() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-6 sm:mb-8">
             <TabsTrigger value="topics" className="text-xs sm:text-sm">Practice Topics</TabsTrigger>
             <TabsTrigger value="diagnostic" className="text-xs sm:text-sm">Diagnostic Test</TabsTrigger>
             <TabsTrigger value="adaptive" className="text-xs sm:text-sm">Adaptive Mode</TabsTrigger>
+            <TabsTrigger value="notes" className="text-xs sm:text-sm">Study Notes</TabsTrigger>
           </TabsList>
 
           {/* Practice Topics Tab */}
@@ -353,7 +362,7 @@ export default function PracticePage() {
                   <Button
                     size="lg"
                     onClick={handleStartDiagnostic}
-                    disabled={diagnosticLoading || !diagnosticData?.problems}
+                    disabled={diagnosticLoading || !((diagnosticData as any)?.problems?.length)}
                     className="text-sm sm:text-base px-6 sm:px-8 py-3"
                     data-testid="button-start-diagnostic"
                   >
@@ -393,6 +402,11 @@ export default function PracticePage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Study Notes Tab */}
+          <TabsContent value="notes" className="space-y-4 sm:space-y-6">
+            <NoteTaking />
           </TabsContent>
         </Tabs>
       </div>

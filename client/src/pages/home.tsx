@@ -31,6 +31,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { AITutor } from "@/components/ai-tutor";
 import { LearningPathDashboard } from "@/components/learning-path";
 import { EnhancedModulesView } from "@/components/enhanced-modules";
+import { EnhancedProgressTracker } from "@/components/enhanced-progress-tracker";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -317,6 +318,27 @@ export default function Home() {
           {/* Learning Path Tab */}
           <TabsContent value="learning-path" className="space-y-6">
             <LearningPathDashboard />
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <EnhancedProgressTracker
+              completedProblems={learningStats.completedProblems}
+              totalProblems={learningStats.totalProblems}
+              moduleProgress={modules.map(module => ({
+                moduleId: module.id,
+                moduleName: module.title,
+                completed: userProgress.filter((p: any) => p.moduleId === module.id && p.completed).length,
+                total: problems.filter(p => p.topic === module.title).length,
+                accuracy: dashboardStats?.topicStats?.[module.title]?.accuracy || 0,
+                timeSpent: Math.floor(Math.random() * 60) + 30, // Mock data - would come from real tracking
+                lastActivity: new Date()
+              }))}
+              studyStreak={dashboardStats?.studyStreak || 1}
+              totalStudyTime={dashboardStats?.weeklyActivity ? dashboardStats.weeklyActivity * 15 : 180}
+              averageAccuracy={learningStats.averageScore}
+              recentActivity={[]}
+            />
           </TabsContent>
 
           {/* Practice Tab */}
