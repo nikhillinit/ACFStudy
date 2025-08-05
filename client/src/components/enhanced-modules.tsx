@@ -81,6 +81,18 @@ export function EnhancedModulesView() {
     retry: false,
   });
 
+  const startLearning = (moduleTitle: string) => {
+    // Navigate to learning page with the specific module
+    const encodedTopic = encodeURIComponent(moduleTitle);
+    window.location.href = `/learning?module=${encodedTopic}`;
+  };
+
+  const startPractice = (moduleTitle: string) => {
+    // Navigate to practice page with the module topic
+    const encodedTopic = encodeURIComponent(moduleTitle);
+    window.location.href = `/practice/${encodedTopic}`;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -297,6 +309,7 @@ export function EnhancedModulesView() {
                   className="w-full text-xs sm:text-sm py-2 sm:py-3" 
                   variant={progress?.completed ? "secondary" : "default"}
                   data-testid={`start-module-${module.id}`}
+                  onClick={() => progress?.completed ? startPractice(module.title) : startLearning(module.title)}
                 >
                   <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   {progress?.completed ? 'Continue Practice' : 'Start Learning'}
