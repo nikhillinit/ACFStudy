@@ -189,13 +189,19 @@ export async function registerReplitRoutes(app: Express): Promise<Server> {
   // PROGRESS TRACKING ROUTES
   // ========================================
 
-  app.get('/api/progress/:userId', requireAuth(replitAuthManager), async (req: any, res) => {
+  app.get('/api/progress/:userId', optionalAuth(replitAuthManager), async (req: any, res) => {
     try {
       const { userId } = req.params;
       
-      // Ensure user can only access their own progress
-      if (req.user.id !== userId) {
+      // Allow access for anonymous users or authenticated users accessing their own data
+      if (req.user && req.user.id !== userId && userId !== 'anonymous_user') {
         return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Return empty progress for anonymous users
+      if (userId === 'anonymous_user') {
+        res.json([]);
+        return;
       }
       
       const progress = await replitDbManager.getProgress(userId);
@@ -245,8 +251,30 @@ export async function registerReplitRoutes(app: Express): Promise<Server> {
   // ANALYTICS ROUTES
   // ========================================
 
-  app.get('/api/analytics/dashboard', requireAuth(replitAuthManager), async (req: any, res) => {
+  app.get('/api/analytics/dashboard', optionalAuth(replitAuthManager), async (req: any, res) => {
     try {
+      // Handle anonymous users
+      if (!req.user) {
+        return res.json({
+          success: true,
+          dashboard: {
+            overallProgress: 0,
+            totalCompleted: 0,
+            totalProblems: 115,
+            overallAccuracy: 0,
+            topicStats: {
+              'Time Value of Money': { completed: 0, total: 25, percentage: 0, accuracy: 0 },
+              'Portfolio Theory': { completed: 0, total: 25, percentage: 0, accuracy: 0 },
+              'Bond Valuation': { completed: 0, total: 25, percentage: 0, accuracy: 0 },
+              'Financial Statements': { completed: 0, total: 15, percentage: 0, accuracy: 0 },
+              'Derivatives': { completed: 0, total: 25, percentage: 0, accuracy: 0 }
+            },
+            weeklyActivity: 0,
+            studyStreak: 0
+          }
+        });
+      }
+
       const userId = req.user.id;
       const progress = await replitDbManager.getProgress(userId) || {};
       
