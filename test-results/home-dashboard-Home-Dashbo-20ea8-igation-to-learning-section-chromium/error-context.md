@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- region "Notifications (F8)":
+  - list
+- banner:
+  - img
+  - heading "ACF Mastery" [level=1]
+  - paragraph: Advanced Corporate Finance Learning Platform
+  - button "Learning Style":
+    - img
+    - text: Learning Style
+- main:
+  - heading "Welcome to Your Learning Dashboard" [level=2]
+  - paragraph: Track your progress and continue your Advanced Corporate Finance journey.
+  - heading "Your ACF Mastery Journey" [level=3]
+  - img
+  - text: 0% Overall 0 Problems 0 Modules 1 Day Streak
+  - link "Practice Center":
+    - /url: /practice
+    - button "Practice Center":
+      - img
+      - text: Practice Center
+      - img
+  - link "Video Lectures":
+    - /url: /learning
+    - button "Video Lectures":
+      - img
+      - text: Video Lectures
+      - img
+  - button "AI Tutor":
+    - img
+    - text: AI Tutor
+  - button "Diagnostic":
+    - img
+    - text: Diagnostic
+  - tablist:
+    - tab "Dashboard" [selected]
+    - tab "Modules"
+    - tab "Learning Path"
+    - tab "Analytics"
+    - tab "Achievements"
+  - tabpanel "Dashboard":
+    - paragraph: Loading modules...
+- img
+- text: Sage encouragement
+- paragraph: Take a moment to appreciate how far you've come.
+- button "Got it!"
+- button "Show Tips"
+- button:
+  - img
+```

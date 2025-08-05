@@ -1,0 +1,75 @@
+# Page snapshot
+
+```yaml
+- region "Notifications (F8)":
+  - list
+- heading "Practice Center" [level=1]
+- paragraph: Master Advanced Corporate Finance through targeted practice sessions and comprehensive diagnostics.
+- tablist:
+  - tab "Practice Topics" [selected]
+  - tab "Challenges"
+  - tab "Diagnostic Test"
+  - tab "Adaptive Mode"
+  - tab "Study Notes"
+- tabpanel "Practice Topics":
+  - img
+  - text: Choose Your Practice Topic
+  - paragraph: Select a topic to practice. Problems are intelligently selected based on your performance and learning progress.
+  - img
+  - heading "Time Value of Money" [level=3]
+  - paragraph: Master present value, future value, and annuity calculations
+  - text: 25 Problems Beginner
+  - img
+  - text: 120min
+  - button "Quick (5)"
+  - button "Full (10)":
+    - img
+    - text: Full (10)
+  - img
+  - heading "Portfolio Theory" [level=3]
+  - paragraph: Learn CAPM, risk-return relationships, and modern portfolio optimization
+  - text: 25 Problems Intermediate
+  - img
+  - text: 150min
+  - button "Quick (5)"
+  - button "Full (10)":
+    - img
+    - text: Full (10)
+  - img
+  - heading "Bond Valuation" [level=3]
+  - paragraph: Understand bond pricing, yield calculations, and duration concepts
+  - text: 25 Problems Intermediate
+  - img
+  - text: 135min
+  - button "Quick (5)"
+  - button "Full (10)":
+    - img
+    - text: Full (10)
+  - img
+  - heading "Financial Statements" [level=3]
+  - paragraph: Analyze financial statements and understand accounting principles
+  - text: 15 Problems Beginner
+  - img
+  - text: 90min
+  - button "Quick (5)"
+  - button "Full (10)":
+    - img
+    - text: Full (10)
+  - img
+  - heading "Derivatives" [level=3]
+  - paragraph: Options, futures, and forward contracts fundamentals
+  - text: 25 Problems Advanced
+  - img
+  - text: 180min
+  - button "Quick (5)"
+  - button "Full (10)":
+    - img
+    - text: Full (10)
+- img
+- text: Sage encouragement
+- paragraph: Remember, learning is a journey, not a race.
+- button "Got it!"
+- button "Show Tips"
+- button:
+  - img
+```
