@@ -5,5 +5,9 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
+# Test results
+test-results/
+playwright-report/
+
 #Ignore vscode AI rules
 .github\copilot-instructions.md

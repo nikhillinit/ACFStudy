@@ -42,6 +42,12 @@ This directory contains comprehensive end-to-end (E2E) tests for the ACF (Advanc
   - Accessibility features
   - Responsive design validation
 
+- **Setup Validation** (`setup-validation.spec.ts`)
+  - Application initialization
+  - Configuration validation
+  - Error scenario handling
+  - Environment compatibility checks
+
 ## 🚀 Running Tests
 
 ### Prerequisites
@@ -108,6 +114,13 @@ Tests use resilient selectors that work across different UI implementations:
 - Semantic HTML selectors (roles, labels)
 - Fallback strategies for dynamic content
 
+### Test Isolation
+Each test runs in isolation to prevent interdependencies:
+- Clean state at the beginning of each test
+- Proper teardown after test completion
+- No shared state between tests
+- Independent fixture setup for each test case
+
 ## 🎯 Test Scenarios
 
 ### Critical User Journeys
@@ -142,6 +155,9 @@ Tests use resilient selectors that work across different UI implementations:
 - Mobile navigation
 - Error page handling
 - Accessibility compliance
+- Browser compatibility issues
+- Slow network connections
+- Session expiration
 
 ## 🔧 Troubleshooting
 
@@ -165,6 +181,12 @@ npx tsx server/index.ts
 - Skip learning module tests if authentication wall is present
 - Focus on practice flows which are generally accessible
 
+**Flaky tests:**
+- Use `test.retry()` for specific flaky tests
+- Add more specific waitFor conditions
+- Consider using test.slow() for complex interactions
+- Check network conditions and server stability
+
 ### Test Debugging
 
 1. **Run in headed mode** to see what's happening:
@@ -184,6 +206,11 @@ npx tsx server/index.ts
    npx playwright test --debug
    ```
 
+5. **Trace Viewer** for detailed step inspection:
+   ```bash
+   npx playwright show-trace test-results/trace.zip
+   ```
+
 ## 📊 Test Reports
 
 After running tests, view detailed reports:
@@ -197,6 +224,8 @@ Reports include:
 - Video recordings
 - Performance metrics
 - Cross-browser compatibility results
+- Console logs and errors
+- Network request details
 
 ## 🎯 Adding New Tests
 
@@ -224,6 +253,9 @@ test.describe('Feature Name', () => {
 5. **Add appropriate waits for dynamic content**
 6. **Test error scenarios**
 7. **Verify accessibility features**
+8. **Keep tests independent and isolated**
+9. **Avoid fixed timeouts where possible**
+10. **Use page object models for complex UIs**
 
 ### Selector Strategy
 ```typescript
@@ -235,6 +267,27 @@ test.describe('Feature Name', () => {
 5. Complex selectors as last resort
 ```
 
+### Page Object Model Example
+```typescript
+// models/HomePage.ts
+export class HomePage {
+  constructor(private page) {}
+  
+  async navigate() {
+    await this.page.goto('/');
+  }
+  
+  async clickLearnModule(moduleName) {
+    await this.page.locator(`[data-module="${moduleName}"]`).click();
+  }
+}
+
+// In test:
+const homePage = new HomePage(page);
+await homePage.navigate();
+await homePage.clickLearnModule('corporate-finance');
+```
+
 ## 📈 Continuous Integration
 
 Tests are configured to run in CI environments:
@@ -242,11 +295,35 @@ Tests are configured to run in CI environments:
 - **Retries enabled** for flaky test resilience
 - **Screenshots and videos** captured for debugging
 - **Multiple browser testing** for compatibility
+- **Detailed reporting** for failure analysis
 
 ### Environment Variables
 - `CI=true` - Enables CI-specific configurations
 - `NODE_ENV=development` - Required for dev server
 - `PORT=5000` - Default application port
+- `PLAYWRIGHT_HTML_REPORT` - Custom report location
+
+### GitHub Actions Integration
+```yaml
+# Example workflow snippet
+steps:
+  - uses: actions/checkout@v3
+  - uses: actions/setup-node@v3
+    with:
+      node-version: 18
+  - name: Install dependencies
+    run: npm ci
+  - name: Install Playwright browsers
+    run: npx playwright install --with-deps
+  - name: Run Playwright tests
+    run: npm run test:e2e
+  - name: Upload test results
+    if: always()
+    uses: actions/upload-artifact@v3
+    with:
+      name: playwright-report
+      path: playwright-report/
+```
 
 ## 🤝 Contributing
 
@@ -262,3 +339,13 @@ For questions or issues with testing, check:
 2. Test output and screenshots
 3. Development server logs
 4. Browser developer tools during headed runs
+
+## 🔄 Maintenance
+
+Regular maintenance helps keep tests reliable:
+1. **Review and update tests** with each feature change
+2. **Refactor common patterns** into helper functions
+3. **Run tests regularly**, not just during deployment
+4. **Monitor test performance** and execution times
+5. **Revisit selectors** when UI changes occur
+6. **Update expected screenshots** when design changes
