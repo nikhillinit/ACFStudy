@@ -4,11 +4,9 @@ import { createServer, type Server } from "http";
 import helmet from "helmet";
 import compression from "compression";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   securityHeaders, 
-  sanitizeInput,
-  enhancedAuth
+  sanitizeInput
 } from "./enhanced-auth";
 import { insertProgressSchema } from "@shared/schema";
 import { aiServices } from "./ai-services";
@@ -36,25 +34,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Input sanitization
   app.use(sanitizeInput);
 
-  // Auth middleware
-  await setupAuth(app);
+  // Auth middleware removed for no-auth mode
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Progress routes (no auth required)
+  app.post('/api/progress/save', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  // Progress routes
-  app.post('/api/progress/save', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || 'anonymous_user';
       const progressData = {
         ...req.body,
         userId,
@@ -71,15 +56,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/progress/:userId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/progress/:userId', async (req: any, res) => {
     try {
       const { userId } = req.params;
-      const requestingUserId = req.user.claims.sub;
-
-      // Users can only access their own progress
-      if (userId !== requestingUserId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
 
       const userProgress = await storage.getUserProgress(userId);
       res.json(userProgress);
@@ -89,15 +68,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/progress/:userId/:moduleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/progress/:userId/:moduleId', async (req: any, res) => {
     try {
       const { userId, moduleId } = req.params;
-      const requestingUserId = req.user.claims.sub;
-
-      // Users can only access their own progress
-      if (userId !== requestingUserId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
 
       const moduleProgress = await storage.getModuleProgress(userId, moduleId);
       res.json(moduleProgress || null);
@@ -135,9 +108,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Enhanced Analytics Dashboard
-  app.get('/api/analytics/dashboard', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/dashboard', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = 'anonymous_user'; // Default user for no-auth mode
       const progress = await storage.getUserProgress(userId) || {};
       
       // Calculate dashboard statistics based on actual modules
@@ -196,8 +169,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI-Powered Routes
-  app.post('/api/ai/explanation', isAuthenticated, async (req: any, res) => {
+  // AI-Powered Routes (no auth required)
+  app.post('/api/ai/explanation', async (req: any, res) => {
     try {
       const { problem, topic, userAnswer, correctAnswer, difficulty } = req.body;
       
@@ -229,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/tutor', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/tutor', async (req: any, res) => {
     try {
       const { topic, userLevel, specificQuestion } = req.body;
       
@@ -259,7 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/generate-problems', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/generate-problems', async (req: any, res) => {
     try {
       const { topic, difficulty, count } = req.body;
       
@@ -289,7 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/market-context/:topic', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/market-context/:topic', async (req: any, res) => {
     try {
       const { topic } = req.params;
       
@@ -375,10 +348,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Learning progress tracking
-  app.post('/api/learning/progress', isAuthenticated, async (req: any, res) => {
+  // Learning progress tracking (no auth required)
+  app.post('/api/learning/progress', async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.body.userId || 'anonymous_user';
       const { lectureId, progress, completed } = req.body;
       
       // In a real implementation, save to database
@@ -394,15 +367,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/learning/progress/:userId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/learning/progress/:userId', async (req: any, res) => {
     try {
-      const userId = req.params.userId;
-      const requestingUserId = req.user?.claims?.sub;
-      
-      // Users can only access their own progress
-      if (userId !== requestingUserId) {
-        return res.status(403).json({ error: 'Access denied' });
-      }
+      const userId = req.params.userId || 'anonymous_user';
       
       // In a real implementation, fetch from database
       // For now, return mock progress data
@@ -475,9 +442,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Diagnostic routes
-  app.post('/api/diagnostic', isAuthenticated, async (req: any, res) => {
+  app.post('/api/diagnostic', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       const resultData = { ...req.body, userId };
       const result = await storage.saveDiagnosticResult(resultData);
       res.json(result);
@@ -487,7 +454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/diagnostic/:userId', isAuthenticated, async (req, res) => {
+  app.get('/api/diagnostic/:userId', async (req, res) => {
     try {
       const { userId } = req.params;
       const results = await storage.getUserDiagnosticResults(userId);
@@ -499,9 +466,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Practice session routes
-  app.post('/api/sessions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/sessions', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       const sessionData = { ...req.body, userId };
       const session = await storage.createPracticeSession(sessionData);
       res.json(session);
@@ -511,7 +478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/sessions/:userId', isAuthenticated, async (req, res) => {
+  app.get('/api/sessions/:userId', async (req, res) => {
     try {
       const { userId } = req.params;
       const sessions = await storage.getUserPracticeSessions(userId);
@@ -523,9 +490,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User session routes
-  app.post('/api/sessions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/sessions', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       const session = await storage.createUserSession(userId);
       res.json(session);
     } catch (error) {
@@ -534,9 +501,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/sessions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/sessions', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       const sessions = await storage.getUserSessions(userId);
       res.json(sessions);
     } catch (error) {
@@ -555,7 +522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Enhanced Practice Session Routes
-  app.get("/api/practice/problems/:topic", isAuthenticated, async (req: any, res) => {
+  app.get("/api/practice/problems/:topic", async (req: any, res) => {
     try {
       const { topic } = req.params;
       const count = parseInt(req.query.count as string) || 10;
@@ -564,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { AdaptiveLearningEngine } = await import('./enhanced-problems');
       
       // Get user progress for adaptive selection
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       const userProgress = {}; // Would get from database in real implementation
       
       const selectedProblems = AdaptiveLearningEngine.selectProblems(topic, userProgress, count);
@@ -581,10 +548,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/practice/session/complete", isAuthenticated, async (req: any, res) => {
+  app.post("/api/practice/session/complete", async (req: any, res) => {
     try {
       const { sessionResults } = req.body;
-      const userId = req.user.claims.sub;
+      const userId = req.body.userId || "anonymous_user";
       
       // Calculate performance metrics
       const performance = {
@@ -607,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/diagnostic/test", isAuthenticated, async (req: any, res) => {
+  app.get("/api/diagnostic/test", async (req: any, res) => {
     try {
       const { AdaptiveLearningEngine } = await import('./enhanced-problems');
       const diagnosticProblems = AdaptiveLearningEngine.createDiagnosticTest();

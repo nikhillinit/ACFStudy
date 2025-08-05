@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
-import type { User, Module, Problem } from "@shared/schema";
+import type { Module, Problem } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,6 @@ import {
   BookOpen, 
   TrendingUp, 
   Clock, 
-  LogOut,
   User as UserIcon,
   BarChart3,
   Target,
@@ -27,55 +25,39 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { AITutor } from "@/components/ai-tutor";
 import { LearningPathDashboard } from "@/components/learning-path";
 import { EnhancedModulesView } from "@/components/enhanced-modules";
 import { EnhancedProgressTracker } from "@/components/enhanced-progress-tracker";
-import { AIStudyCompanion } from "@/components/ai-study-companion";
-import { useStudyCompanion } from "@/hooks/useStudyCompanion";
 import { useLearningStyle } from "@/hooks/useLearningStyle";
 import LearningStyleModal from "@/components/LearningStyleModal";
 import LearningStyleBadge from "@/components/LearningStyleBadge";
 
 export default function Home() {
-  const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const [showAITutor, setShowAITutor] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [showLearningStyleModal, setShowLearningStyleModal] = useState(false);
   const { learningStyle, hasCompletedQuiz, isLoading: learningStyleLoading } = useLearningStyle();
 
-  // Initialize study companion
-  const { companionData } = useStudyCompanion({
-    userId: user?.id,
-    currentContext: {
-      page: 'home'
-    }
-  });
+  // Create anonymous user ID for features that need tracking
+  const anonymousUserId = "anonymous_user";
 
-  // Type guard for user data
-  const typedUser = user as User | undefined;
-
-  // Fetch learning data
+  // Fetch learning data (now available for all users)
   const { data: modules = [] } = useQuery<Module[]>({
     queryKey: ["/api/modules"],
-    enabled: !!user,
   });
 
   const { data: problems = [] } = useQuery<Problem[]>({
     queryKey: ["/api/problems"],
-    enabled: !!user,
   });
 
   const { data: userProgress = [] } = useQuery<any[]>({
-    queryKey: ["/api/progress", typedUser?.id],
-    enabled: !!typedUser?.id,
+    queryKey: ["/api/progress", anonymousUserId],
   });
 
   const { data: dashboardData } = useQuery<{dashboard: any}>({
     queryKey: ["/api/analytics/dashboard"],
-    enabled: !!typedUser?.id,
   });
 
   // Use enhanced analytics data if available, fallback to calculated stats
@@ -113,50 +95,18 @@ export default function Home() {
     window.location.href = `/practice/${encodedTopic}`;
   };
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !typedUser) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [typedUser, isLoading, toast]);
-
   // Show learning style quiz for new users
   useEffect(() => {
-    if (!learningStyleLoading && typedUser && !hasCompletedQuiz) {
+    if (!learningStyleLoading && !hasCompletedQuiz) {
       // Small delay to let the page load first
       const timer = setTimeout(() => {
         setShowLearningStyleModal(true);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [learningStyleLoading, typedUser, hasCompletedQuiz]);
+  }, [learningStyleLoading, hasCompletedQuiz]);
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!typedUser) {
-    return null; // Will redirect to login
-  }
+  // No loading state needed anymore
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -170,7 +120,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">ACF Mastery</h1>
-                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Welcome back, {typedUser.firstName || typedUser.email}</p>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Advanced Corporate Finance Learning Platform</p>
               </div>
             </div>
             
@@ -189,31 +139,15 @@ export default function Home() {
                   </Button>
                 </div>
               )}
-              <div className="hidden md:flex items-center space-x-2">
-                {typedUser.profileImageUrl ? (
-                  <img 
-                    src={typedUser.profileImageUrl} 
-                    alt="Profile" 
-                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
-                  </div>
-                )}
-                <span className="text-xs sm:text-sm font-medium text-gray-700">
-                  {typedUser.firstName || typedUser.email}
-                </span>
-              </div>
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={handleLogout}
+                onClick={() => setShowLearningStyleModal(true)}
                 className="text-xs sm:text-sm py-1 sm:py-2 px-2 sm:px-3"
-                data-testid="button-logout"
+                data-testid="button-learning-style-settings"
               >
-                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Logout</span>
+                <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Learning Style</span>
               </Button>
             </div>
           </div>
@@ -300,7 +234,7 @@ export default function Home() {
           <TabsContent value="dashboard" className="space-y-6">
             {/* Module Progress Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-              {modules.map((module) => {
+              {modules && modules.length > 0 ? modules.map((module) => {
                 const IconComponent = topicIcons[module.title] || BookOpen;
                 const moduleProblems = problems.filter(p => p.topic === module.title);
                 const completedCount = userProgress.filter((p: any) => p.moduleId === module.id && p.completed).length;
@@ -349,7 +283,11 @@ export default function Home() {
                     </CardContent>
                   </Card>
                 );
-              })}
+              }) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-500">Loading modules...</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -368,7 +306,7 @@ export default function Home() {
             <EnhancedProgressTracker
               completedProblems={learningStats.completedProblems}
               totalProblems={learningStats.totalProblems}
-              moduleProgress={modules.map(module => ({
+              moduleProgress={modules && modules.length > 0 ? modules.map(module => ({
                 moduleId: module.id,
                 moduleName: module.title,
                 completed: userProgress.filter((p: any) => p.moduleId === module.id && p.completed).length,
@@ -376,7 +314,7 @@ export default function Home() {
                 accuracy: dashboardStats?.topicStats?.[module.title]?.accuracy || 0,
                 timeSpent: Math.floor(Math.random() * 60) + 30, // Mock data - would come from real tracking
                 lastActivity: new Date()
-              }))}
+              })) : []}
               studyStreak={dashboardStats?.studyStreak || 1}
               totalStudyTime={dashboardStats?.weeklyActivity ? dashboardStats.weeklyActivity * 15 : 180}
               averageAccuracy={learningStats.averageScore}
@@ -398,7 +336,7 @@ export default function Home() {
               </CardHeader>
               <CardContent className="p-3 sm:p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                  {modules.map((module) => {
+                  {modules && modules.length > 0 ? modules.map((module) => {
                     const IconComponent = topicIcons[module.title] || BookOpen;
                     return (
                       <Button
@@ -417,7 +355,11 @@ export default function Home() {
                         </div>
                       </Button>
                     );
-                  })}
+                  }) : (
+                    <div className="col-span-full text-center py-8">
+                      <p className="text-gray-500">Loading modules...</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -545,22 +487,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* AI Study Companion */}
-      {companionData.shouldShow && (
-        <AIStudyCompanion
-          userProgress={companionData.userProgress}
-          currentContext={companionData.currentContext}
-          onDismiss={() => {
-            // Companion handles hiding itself
-          }}
-          onInteraction={(type, data) => {
-            if (type === 'start_practice') {
-              // Navigate to practice page with specific topic
-              window.location.href = `/practice?topic=${encodeURIComponent(data.topic)}`;
-            }
-          }}
-        />
-      )}
+      {/* AI Study Companion removed - no authentication needed */}
 
       {/* Learning Style Modal */}
       <LearningStyleModal
