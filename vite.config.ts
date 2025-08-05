@@ -16,6 +16,9 @@ export default defineConfig({
         ]
       : []),
   ],
+  define: {
+    'process.env': process.env,
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
